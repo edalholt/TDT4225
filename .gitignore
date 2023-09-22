@@ -7,4 +7,12 @@
 /dataSources/
 /dataSources.local.xml
 
-.idea
+# Editors
+.vscode/
+.idea/
+
+.DS_Store
+**/.DS_Store
+
+
+/dataset
