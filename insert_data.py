@@ -1,5 +1,5 @@
 import json
-
+import DbConnector
 user_tables = []
 user_activities = []
 track_points = []
@@ -23,7 +23,7 @@ with open('output.json', 'r') as json_file:
                 point = track_point.split(',')
                 lat = float(point[0])
                 lon = float(point[1])
-                altitude = int(point[3])
+                altitude = int(float(point[3]))
                 date_days = float(point[4])
                 date_time = point[5]
                 i = 0
@@ -38,8 +38,8 @@ with open('output.json', 'r') as json_file:
                 })
                 i += 1
 
-print(user_tables)
-print(user_activities)
-print(track_points[:50])
+
 
 # SQL Statements her
+
+conn = DbConnector.DbConnector()
