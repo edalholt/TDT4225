@@ -15,6 +15,9 @@ Git repository: xxx
 ## Results
 Add your results from the tasks, both as text and screenshots. Short sentences are sufficient.
 
+### Task 1: 
+showing top 10 rows from all of your tables is sufficient
+
 ## Discussion
 Discuss your solutions. Did you do anything differently than how it was explained in the assignment sheet, in that case why and how did that work? Were there any pain points or problems? What did you learn from this assignment?
 
