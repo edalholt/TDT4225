@@ -4,8 +4,8 @@ TDT4225 - Very Large, Distributed Data Volumes
 # Report - template
 ## Assignment 2 - MySQL
 
-## Group: xx
-Students: Name Namesen, Dude Dudesen, ...
+Group: 36
+Students: Eivind Dalholt, Vegard Henriksen and Synne Ødegaard
 
 ## Introduction
 Briefly explain the task and the problems you have solved. How did you work as a group? If you used Git, a link to the repository would be nice.
