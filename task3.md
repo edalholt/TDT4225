@@ -18,7 +18,7 @@ Add your results from the tasks, both as text and screenshots. Short sentences a
 ## Discussion
 Discuss your solutions. Did you do anything differently than how it was explained in the assignment sheet, in that case why and how did that work? Were there any pain points or problems? What did you learn from this assignment?
 
-Did differently (will rewrite):
+Did differently:
 - Activity ID is string instead of an integer (which was suggested in the assignment sheet). This is because trackpoints need a foreign key to activity. When inserting trackpoints into the database, it is necessary to know the ID of the activity the trackpoint belongs to. This is not possible if the ID is auto generated. In order to always be able to infer the activity ID, the group opted for a solution where the activity ID is the combination of the start time and the user's ID. The user ID is a string; therefore, the activity ID has to be a string as well.
 
 
