@@ -54,7 +54,7 @@ def convert_filename_to_datetime_format(filename: str) -> str:
     return f"{year}-{month}-{day} {hour}:{minute}:{second}"
 
 
-def match_labels(label_path : str, file_name : str, end_time : str):
+def match_labels(label_path: str, file_name: str, end_time: str):
     """
     Finds the correct transportation modes for the files that have labels.
     Args:
@@ -82,7 +82,7 @@ def match_labels(label_path : str, file_name : str, end_time : str):
         return None
 
 
-def get_data(path_to_labels : str, dataset_path: str) -> dict:
+def get_data(path_to_labels: str, dataset_path: str) -> dict:
     """
     Args:
         path_to_labels: Path to the labels.txt file.
