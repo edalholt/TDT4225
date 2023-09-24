@@ -1,4 +1,5 @@
 import json
+import time
 from DbConnector import DbConnector
 from tabulate import tabulate
 user_tables = []
@@ -49,9 +50,14 @@ class InsertData:
                         i += 1
         
     def insert_user_data(self):
-        # SQL Statements her
         insert_query = "INSERT INTO User (id, has_labels) VALUES (%s, %s)"
         data_to_insert = [(item["id"], item["has_labels"]) for item in user_tables]
+        self.cursor.executemany(insert_query, data_to_insert)
+        self.db_connection.commit()
+
+    def insert_activity_data(self):
+        insert_query = "INSERT INTO Activity (id, user_id, transportation_mode, start_time, end_time) VALUES (%s, %s, %s, %s, %s)"
+        data_to_insert = [(item["id"], item["user_id"], item["transportation_mode"], item["start_time"], item["end_time"]) for item in user_activities]
         self.cursor.executemany(insert_query, data_to_insert)
         self.db_connection.commit()
 
@@ -60,9 +66,20 @@ def main():
     try:
         program = InsertData()
         print("Loading data...")
+        start_time = time.time()
         program.load_data()
+        print("Loaded data in " + str(time.time() - start_time) + " seconds")
+
         print("Inserting user data...")
+        start_time = time.time()
         program.insert_user_data()
+        print("Inserted user data in " + str(time.time() - start_time) + " seconds")
+
+        print("Inserting activity data...")
+        start_time = time.time()
+        program.insert_activity_data()
+        print("Inserted activity data in " + str(time.time() - start_time) + " seconds")
+
         print("Done!")
 
     except Exception as e:
