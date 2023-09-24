@@ -31,7 +31,7 @@ class ExampleProgram:
     def create_activity_schema(self):
         # Create new table if not exist for Activity
         query = """CREATE TABLE IF NOT EXISTS %s (
-            id INT NOT NULL PRIMARY KEY)
+            id VARCHAR(30) NOT NULL PRIMARY KEY)
         """
         self.cursor.execute(query % ("Activity"))
         
@@ -55,13 +55,13 @@ class ExampleProgram:
     def create_trackpoint_schema(self):
         # Create new table if not exist for TrackPoint
         query = """CREATE TABLE IF NOT EXISTS %s (
-            id INT NOT NULL PRIMARY KEY)
+            id INT AUTO_INCREMENT NOT NULL PRIMARY KEY)
                 """
         self.cursor.execute(query % ("TrackPoint"))
         
         # TrackPoint has a ID (string), activity_id (int), lat (float), lon (float), altitude (float), date_days (float), date_time (datetime)
         self.cursor.execute(
-            "ALTER TABLE TrackPoint ADD COLUMN activity_id INT NOT NULL")
+            "ALTER TABLE TrackPoint ADD COLUMN activity_id VARCHAR(30) NOT NULL")
         # activity_id has cascade on delete, meaning that if an activity is deleted, all trackpoints belonging to that activity will also be deleted.
         self.cursor.execute(
             "ALTER TABLE TrackPoint ADD FOREIGN KEY (activity_id) REFERENCES Activity(id) ON DELETE CASCADE")
@@ -71,7 +71,7 @@ class ExampleProgram:
         self.cursor.execute(
             "ALTER TABLE TrackPoint ADD COLUMN lon FLOAT")
         self.cursor.execute(
-            "ALTER TABLE TrackPoint ADD COLUMN altitude FLOAT")
+            "ALTER TABLE TrackPoint ADD COLUMN altitude INT")
         self.cursor.execute(
             "ALTER TABLE TrackPoint ADD COLUMN date_days FLOAT")
         self.cursor.execute(
