@@ -34,3 +34,5 @@ Did differently:
 
 ## Feedback
 Optional - give us feedback on the task if you have any. The assignment is new this semester and we would love to improve if there were any problems.
+
+It would be nice to know what's important to the evaluation (code quality, how fast the code runs, how detailed the report should be etc)
