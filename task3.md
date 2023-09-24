@@ -1,6 +1,6 @@
 # Assignment 2 - MySQL
 
-Group: 36
+Group: 36 \n
 Students: Eivind Dalholt, Vegard Henriksen and Synne Ødegaard
 
 ## Introduction
