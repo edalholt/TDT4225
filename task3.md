@@ -18,9 +18,11 @@ Add your results from the tasks, both as text and screenshots. Short sentences a
 ## Discussion
 Discuss your solutions. Did you do anything differently than how it was explained in the assignment sheet, in that case why and how did that work? Were there any pain points or problems? What did you learn from this assignment?
 
-Solution to task 1:
-- Made a Python script to create the database, as suggested in the assignment sheet
-- Clean and insert data: First, data is cleaned in accordance with the task, and then processed into an appropriate format. The data is added to a json file. Then, data is read from the json file into three lists: one for users, one for activities and one for trackpoints. The lists for users and activities are each inserted into the database in one bulk. The list for trackpoints, however, is divided into chunks before being inserted, as the list is too large to be inserted in a single bulk.
+### Solution to task 1:
+A Python script was made to create the database, as suggested in the assignment sheet. The data was first cleaned in accordance with the task, and then processed into an appropriate format. The data was added to a JSON file. Then, data was read from the JSON file into three lists: one for users, one for activities and one for trackpoints. The lists for users and activities were each inserted into the database in one bulk. The list for trackpoints, however, was divided into chunks before being inserted, as the list was too large to be inserted in a single bulk.
+
+### Solution to task 2:
+-
 
 Did differently:
 - Activity ID is string instead of an integer (which was suggested in the assignment sheet). This is because trackpoints need a foreign key to activity. When inserting trackpoints into the database, it is necessary to know the ID of the activity the trackpoint belongs to. This is not possible if the ID is auto generated. In order to always be able to infer the activity ID, the group opted for a solution where the activity ID is the combination of the start time and the user's ID. The user ID is a string; therefore, the activity ID has to be a string as well.
