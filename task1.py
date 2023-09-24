@@ -71,7 +71,7 @@ class ExampleProgram:
         self.cursor.execute(
             "ALTER TABLE TrackPoint ADD COLUMN lon FLOAT")
         self.cursor.execute(
-            "ALTER TABLE TrackPoint ADD COLUMN altitude FLOAT")
+            "ALTER TABLE TrackPoint ADD COLUMN altitude INT")
         self.cursor.execute(
             "ALTER TABLE TrackPoint ADD COLUMN date_days FLOAT")
         self.cursor.execute(

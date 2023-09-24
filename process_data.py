@@ -100,7 +100,7 @@ def get_data(path_to_labels: str, dataset_path: str) -> dict:
         i = 0
         for file in os.listdir(trajectory_path):
             file_path = os.path.join(trajectory_path, file)
-            file_name = (file_path.split('\\')[-1])
+            file_name = os.path.basename(file_path)
             if file_path.endswith('.plt'):
                 result = clean_data(file_path)
                 if result:
