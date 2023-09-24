@@ -1,8 +1,4 @@
-# TDT4225
-TDT4225 - Very Large, Distributed Data Volumes
-
-# Report - template
-## Assignment 2 - MySQL
+# Assignment 2 - MySQL
 
 Group: 36
 Students: Eivind Dalholt, Vegard Henriksen and Synne Ødegaard
