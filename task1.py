@@ -122,7 +122,6 @@ def main():
     try:
         program = ExampleProgram()
         program.initialize_database()
-
         program.show_tables()
 
     except Exception as e:
