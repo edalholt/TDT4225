@@ -38,9 +38,12 @@ def main():
     try:
         program = task2()
         program.show_tables()
-        program.execute_sql_query("SELECT * FROM Activity LIMIT 10")
-
-
+        #program.execute_sql_query("SELECT user_id, COUNT(user_id) AS 'Number of activities' FROM Activity GROUP BY user_id ORDER BY COUNT(user_id) DESC LIMIT 15")
+        #program.execute_sql_query("SELECT user_id, start_date_time, end_date_time, COUNT(*) as count FROM Activity GROUP BY user_id, start_date_time, end_date_time HAVING count > 1")
+        #program.execute_sql_query("SELECT * FROM TrackPoint LIMIT 10")
+        program.execute_sql_query("SELECT altitude, Activity.id, TrackPoint.id FROM Activity INNER JOIN TrackPoint ON Activity.id=TrackPoint.activity_id LIMIT 50")
+        #program.execute_sql_query("SELECT altitude, TrackPoint.id, activity_id, user_id FROM TrackPoint INNER JOIN Activity ON TrackPoint.activity_id=Activity.id LIMIT 10")
+        #program.execute_sql_query("SELECT COUNT(Activity.id) FROM Activity")
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
