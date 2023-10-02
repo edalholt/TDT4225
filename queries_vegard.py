@@ -1,8 +1,4 @@
-from itertools import combinations
-
-import numpy as np
 import pandas as pd
-from haversine import haversine
 from tabulate import tabulate
 
 from DbConnector import DbConnector
@@ -44,63 +40,106 @@ def main():
     try:
         program = task2()
         program.show_tables()
-        # Query 2
-        # program.execute_sql_query(
-        #     """
-        #     SELECT user_id,
-        #     AVG(trackpoint_count) AS avg_trackpoints_per_activity,
-        #      MIN(trackpoint_count) AS min_trackpoints,
-        #     MAX(trackpoint_count) AS max_trackpoints
-        #
-        #     FROM
-        #         (
-        #         SELECT user_id, COUNT(activity_id) AS trackpoint_count
-        #         FROM Activity
-        #         INNER JOIN TrackPoint ON Activity.id = TrackPoint.activity_id
-        #         GROUP BY user_id, activity_id
-        #     ) AS ActivityData
-        #     GROUP BY user_id
-        #     """
-        # )
-        # Query 5
-        # program.execute_sql_query(
-        #     """
-        #     SELECT user_id, COUNT(DISTINCT (transportation_mode)) AS unique_modes
-        #     FROM Activity
-        #     WHERE Transportation_mode IS NOT NULL
-        #     GROUP BY user_id
-        #     ORDER BY unique_modes DESC
-        #     LIMIT 10
-        #     """
-        #
-        # )
-        # Query 8
-        query = """
-            SELECT 
-                user_id,
-                lat,
-                lon,
-                date_time
-            FROM User
-            JOIN Activity ON User.id = Activity.user_id
-            JOIN TrackPoint ON Activity.id = TrackPoint.activity_id
-            
+        query2 = """
+         SELECT user_id,
+            AVG(trackpoint_count) AS avg_trackpoints_per_activity,
+             MIN(trackpoint_count) AS min_trackpoints,
+            MAX(trackpoint_count) AS max_trackpoints
+
+            FROM
+                (
+                SELECT user_id, COUNT(activity_id) AS trackpoint_count
+                FROM Activity
+                INNER JOIN TrackPoint ON Activity.id = TrackPoint.activity_id
+                GROUP BY user_id, activity_id
+            ) AS ActivityData
+            GROUP BY user_id
         """
+        # program.execute_sql_query(query2)
+        query5 = """
+            SELECT user_id, COUNT(DISTINCT (transportation_mode)) AS unique_modes
+            FROM Activity
+            WHERE Transportation_mode IS NOT NULL
+            GROUP BY user_id
+            ORDER BY unique_modes DESC
+            LIMIT 10
+        """
+        # program.execute_sql_query(query5)
+        create_temp_table = """
+        CREATE TEMPORARY TABLE TempOverlappingActivities AS
+        SELECT 
+            a1.id AS activity_id1,
+            a2.id AS activity_id2
+        FROM 
+            Activity AS a1
+        JOIN 
+            Activity AS a2 ON a1.user_id != a2.user_id
+        WHERE 
+            a2.start_date_time <= a1.end_date_time
+            AND a2.end_date_time >= a1.start_date_time;
+                """
+        query8 = """
+                SELECT 
+            a1.user_id AS user1,
+            a2.user_id AS user2,
+            tp1.lat AS lat1,
+            tp1.lon AS lon1,
+            tp1.date_time AS date_time1,
+            tp2.lat AS lat2,
+            tp2.lon AS lon2,
+            tp2.date_time AS date_time2
+        FROM 
+            TempOverlappingActivities oa
+        JOIN 
+            Activity a1 ON oa.activity_id1 = a1.id
+        JOIN 
+            Activity a2 ON oa.activity_id2 = a2.id
+        JOIN 
+            TrackPoint tp1 ON oa.activity_id1 = tp1.activity_id
+        JOIN 
+            TrackPoint tp2 ON oa.activity_id2 = tp2.activity_id;
+        """
+        results = program.execute_sql_query(create_temp_table)
+        print(results)
+        program.execute_sql_query(query8)
 
-        # df = pd.read_sql_query(query, program.db_connection)
-        # df.to_csv('data.csv', index=False)
+
+
+
+
+
+
+
+
+
+
+        df = pd.read_sql_query(query8, program.db_connection)
+        df.to_csv('data2.csv', index=False)
+        print("Saved to csv.")
         df = pd.read_csv('data.csv')
-        df.groupby('user_id').agg({'lat': list, 'lon': list, 'date_time': list}).reset_index()
+        df_reduced = df[0:100000]
+        df_reduced.to_csv('data_reduced.csv', index=False)
+        print("Read csv into memory")
+        df['date_time'] = pd.to_datetime(df['date_time'])
+        df = df.sort_values(by=['activity_id'])
 
-        close_users = []
-        for (idx1, row1), (idx2, row2) in combinations(df.iterrows(), 2):
-            time_diff = np.abs((row1['date_time'] - row2['date_time']).total_seconds())
-            coord1 = (row1['lat'], row1['lon'])
-            coord2 = (row2['lat'], row2['lon'])
-            spatial_diff = haversine(coord1, coord2, unit='m')
-            if time_diff <= 30 and spatial_diff <= 50:
-                close_users.append((row1['user_id'], row2['user_id']))
-        print(close_users)
+        close_users = set()
+        for _, row1 in df.iterrows():
+            time_delta = pd.Timedelta(seconds=30)
+        # Find users who have invalid activies (trackpoints deviate with 5 minutes) and count them
+        query11 = """
+          WITH UserTrackPoints AS (
+            SELECT user_id, TrackPoint.id as track_point_id, date_time
+            FROM Activity
+            INNER JOIN TrackPoint ON Activity.id = TrackPoint.activity_id
+            )
+            SELECT a.user_id,  COUNT(DISTINCT (a.track_point_id)) AS invalid_trackpoints
+            FROM UserTrackPoints a
+            JOIN UserTrackPoints b ON a.track_point_id = b.track_point_id - 1 AND a.user_id = b.user_id
+            WHERE ABS(TIMESTAMPDIFF(MINUTE , a.date_time, b.date_time)) >= 5  
+            GROUP BY a.user_id
+        """
+    # program.execute_sql_query(query11)
 
     except Exception as e:
 
