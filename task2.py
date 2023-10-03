@@ -30,52 +30,49 @@ class task2:
         self.cursor.execute(query)
         rows = self.cursor.fetchall()
 
-        #print("Data from query, tabulated: \n")
-        #print(tabulate(rows, headers=self.cursor.column_names))
+        print("Data from query, tabulated: \n")
+        print(tabulate(rows, headers=self.cursor.column_names))
         return rows
+
+    def execute_sql_no_print(self, query):
+        self.cursor.execute(query)
+        rows = self.cursor.fetchall()
+        return rows
+
+def query9(program):
+    rows = program.execute_sql_no_print("SELECT altitude, Activity.id AS activity_id, TrackPoint.id AS tp_id, Activity.user_id AS user_id FROM Activity INNER JOIN TrackPoint ON Activity.id=TrackPoint.activity_id")
+    users_dict = {}
+    for row in range (1, len(rows)):
+        user_id = rows[row][-1]
+        current_alt = rows[row][0]
+        prev_alt = rows[row-1][0]
+
+        if user_id not in users_dict:
+            users_dict[user_id] = 0
+
+        # her sjekker vi om denne alt er større enn forrige alt OG om det er samme aktivitet
+        if(current_alt > prev_alt and rows[row][1] == rows[row-1][1]):
+            users_dict[user_id] = users_dict[user_id] + current_alt - prev_alt
+
+    top_15 = []
+    for i in range(15):
+        most_alt_gained = (max(users_dict, key=users_dict.get), max(users_dict.values()))
+        top_15.append(most_alt_gained)
+        del users_dict[max(users_dict, key=users_dict.get)]
+    #users_list = list(sorted_users_dict.items())
+    print(tabulate(top_15, headers=["user_id", "total meters gained"]))
 
 def main():
     program = None
     try:
         program = task2()
         program.show_tables()
+        #test#for#q9#program.execute_sql_query("SELECT altitude, Activity.id AS activity_id, TrackPoint.id AS tp_id, Activity.user_id AS user_id FROM Activity INNER JOIN TrackPoint ON Activity.id=TrackPoint.activity_id WHERE user_id=001")
         #this#program.execute_sql_query("SELECT user_id, COUNT(user_id) AS 'Number of activities' FROM Activity GROUP BY user_id ORDER BY COUNT(user_id) DESC LIMIT 15")
         #this#program.execute_sql_query("SELECT user_id, start_date_time, end_date_time, COUNT(*) as count FROM Activity GROUP BY user_id, start_date_time, end_date_time HAVING count > 1")
         #program.execute_sql_query("SELECT * FROM TrackPoint LIMIT 10")
         #program.execute_sql_query("SELECT altitude, Activity.id, TrackPoint.id FROM Activity INNER JOIN TrackPoint ON Activity.id=TrackPoint.activity_id LIMIT 50")
         #program.execute_sql_query("SELECT altitude, TrackPoint.id, activity_id, user_id FROM TrackPoint INNER JOIN Activity ON TrackPoint.activity_id=Activity.id LIMIT 10")
-        #program.execute_sql_query("SELECT COUNT(Activity.id) FROM Activity")
-        #df = pd.read_sql_query("SELECT ...", program.db_connection)
-        #activity_coordinates = df.groupby('activity_id').agg({'lat': list, 'lon': list, 'transportation_mode': list}).reset_index()
-        #altitudes = df.groupby('activity_id').agg({'alt': list}).reset_index()
-       # for index, row in altitudes.iterrows():
-        #    activity_id = row['activity_id']
-         #   altitide = row['alt']
-        rows = program.execute_sql_query("SELECT altitude, Activity.id AS activity_id, TrackPoint.id AS tp_id, Activity.user_id AS user_id FROM Activity INNER JOIN TrackPoint ON Activity.id=TrackPoint.activity_id")
-        users_dict = {}
-        for row in range (1, len(rows)):
-            user_id = rows[row][-1]
-            current_alt = rows[row][0]
-            prev_alt = rows[row-1][0]
-
-            # sett inn brukerid i hashmap
-            if user_id not in users_dict:
-                users_dict[user_id] = 0
-
-            # her sjekker vi om denne alt er større enn forrige alt OG om det er samme aktivitet
-            if(current_alt > prev_alt and rows[row][1] == rows[row-1][1]):
-                users_dict[user_id] = users_dict[user_id] + current_alt - prev_alt
-            #print(user_id + ", " + str(users_dict[user_id]))
-
-        #sorted_users_dict = sorted(users_dict, reverse=True)
-        top_15 = []
-        for i in range(15):
-            most_alt_gained = (max(users_dict, key=users_dict.get), max(users_dict.values()))
-            top_15.append(most_alt_gained)
-            del users_dict[max(users_dict, key=users_dict.get)]
-        #users_list = list(sorted_users_dict.items())
-        print(top_15)
-
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
