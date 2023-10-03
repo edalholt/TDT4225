@@ -46,12 +46,15 @@ def query9(program):
         user_id = rows[row][-1]
         current_alt = rows[row][0]
         prev_alt = rows[row-1][0]
+        current_activity = rows[row][1] 
+        prev_activity = rows[row-1][1]
 
         if user_id not in users_dict:
             users_dict[user_id] = 0
 
         # her sjekker vi om denne alt er større enn forrige alt OG om det er samme aktivitet
-        if(current_alt > prev_alt and rows[row][1] == rows[row-1][1]):
+        # spørsmål: kan høyde være mindre enn 0? type hvis man dykker eller at man er i nederland eller noe?
+        if(current_alt >= 0 and prev_alt >= 0 and current_alt > prev_alt and current_activity == prev_activity):
             users_dict[user_id] = users_dict[user_id] + current_alt - prev_alt
 
     top_15 = []
@@ -62,17 +65,40 @@ def query9(program):
     #users_list = list(sorted_users_dict.items())
     print(tabulate(top_15, headers=["user_id", "total meters gained"]))
 
+def query12(program):
+    #rows = program.execute_sql_query("SELECT User.id, transportation_mode FROM User INNER JOIN Activity ON User.id = Activity.user_id WHERE transportation_mode IS NOT NULL")
+    #rows = program.execute_sql_query("""WITH """)
+    rows = program.execute_sql_query("""WITH MostFrequent AS (
+            SELECT
+                User.id,
+                transportation_mode,
+                RANK() OVER (PARTITION BY User.id ORDER BY COUNT(*) DESC) AS most_frequent
+            FROM
+                User
+                INNER JOIN Activity ON User.id = Activity.user_id
+            WHERE
+                transportation_mode IS NOT NULL
+            GROUP BY
+                User.id, transportation_mode
+        )
+        SELECT
+        id,
+        transportation_mode
+        FROM
+        MostFrequent
+        WHERE
+        most_frequent = 1;
+    """)
+
 def main():
     program = None
     try:
         program = task2()
         program.show_tables()
-        #test#for#q9#program.execute_sql_query("SELECT altitude, Activity.id AS activity_id, TrackPoint.id AS tp_id, Activity.user_id AS user_id FROM Activity INNER JOIN TrackPoint ON Activity.id=TrackPoint.activity_id WHERE user_id=001")
+
         #this#program.execute_sql_query("SELECT user_id, COUNT(user_id) AS 'Number of activities' FROM Activity GROUP BY user_id ORDER BY COUNT(user_id) DESC LIMIT 15")
         #this#program.execute_sql_query("SELECT user_id, start_date_time, end_date_time, COUNT(*) as count FROM Activity GROUP BY user_id, start_date_time, end_date_time HAVING count > 1")
-        #program.execute_sql_query("SELECT * FROM TrackPoint LIMIT 10")
-        #program.execute_sql_query("SELECT altitude, Activity.id, TrackPoint.id FROM Activity INNER JOIN TrackPoint ON Activity.id=TrackPoint.activity_id LIMIT 50")
-        #program.execute_sql_query("SELECT altitude, TrackPoint.id, activity_id, user_id FROM TrackPoint INNER JOIN Activity ON TrackPoint.activity_id=Activity.id LIMIT 10")
+
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
