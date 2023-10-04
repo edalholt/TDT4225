@@ -73,7 +73,7 @@ Discuss your solutions. Did you do anything differently than how it was explaine
 A Python script was made to create the database, as suggested in the assignment sheet. The data was first cleaned in accordance with the task, and then processed into an appropriate format. The data was added to a JSON file. Then, data was read from the JSON file into three lists: one for users, one for activities and one for trackpoints. The lists for users and activities were each inserted into the database in one bulk. The list for trackpoints, however, was divided into chunks before being inserted, as the list was too large to be inserted in a single bulk.
 
 ### Solution to task 2:
--
+In task 2, the questions were divided among the group members. The questions were divided in such a way that all group members got to try both easy and more difficult questions. For some questions, it was sufficient to only write a query, while other questions required both a query and Python code.
 
 #### Did differently:
 - Activity ID is string instead of an integer (which was suggested in the assignment sheet). This is because trackpoints need a foreign key to activity. When inserting trackpoints into the database, it is necessary to know the ID of the activity the trackpoint belongs to. This is not possible if the ID is auto generated. In order to always be able to infer the activity ID, the group opted for a solution where the activity ID is the combination of the start time and the user's ID. The user ID is a string; therefore, the activity ID has to be a string as well. This worked well, and the group did not experience any issues related to the change.
