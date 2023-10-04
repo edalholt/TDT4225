@@ -16,7 +16,7 @@ Git repository: xxx
 Add your results from the tasks, both as text and screenshots. Short sentences are sufficient.
 
 ### Task 1: 
-First ten rows from User:
+First ten rows from User: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/6cf42e05-1ec1-4dfe-90a2-72e374beff90)
 
 First ten rows from Activity:
