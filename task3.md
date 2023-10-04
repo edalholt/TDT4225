@@ -16,7 +16,14 @@ Git repository: xxx
 Add your results from the tasks, both as text and screenshots. Short sentences are sufficient.
 
 ### Task 1: 
-showing top 10 rows from all of your tables is sufficient
+First ten rows from User:
+![image](https://github.com/edalholt/TDT4225/assets/69513928/6cf42e05-1ec1-4dfe-90a2-72e374beff90)
+
+First ten rows from Activity:
+![image](https://github.com/edalholt/TDT4225/assets/69513928/b671823f-53b7-4d0c-9eaa-13ac3662632a)
+
+First ten rows from TrackPoint:
+![image](https://github.com/edalholt/TDT4225/assets/69513928/03e101d4-e1af-47a8-9bce-6e8c11bfe361)
 
 ### Task 2:
 (Add pictures and results, describe briefly)
