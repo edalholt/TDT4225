@@ -19,7 +19,7 @@ Add your results from the tasks, both as text and screenshots. Short sentences a
 showing top 10 rows from all of your tables is sufficient
 
 ### Task 2:
-(Add pictures of code and results, describe briefly)
+(Add pictures and results, describe briefly)
 
 Question 1: 
 
@@ -47,7 +47,6 @@ Question 10:
 Question 11: 
 
 Question 12: \
-![image](https://github.com/edalholt/TDT4225/assets/69513928/c1324b5f-79a2-4fb9-a94e-8999b510200d)
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/ece024dd-ad66-42bb-bc21-709574a06581)
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/4242397f-948f-4a3d-bcfb-f95b96515f28)
 
