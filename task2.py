@@ -143,7 +143,7 @@ def query10(program):
 
 def query9(program):
     rows = program.execute_sql_no_print("""SELECT altitude, Activity.id AS activity_id, 
-    TrackPoint.id AS tp_id, Activity.user_id AS user_id 
+    Activity.user_id AS user_id 
     FROM Activity 
     INNER JOIN TrackPoint ON Activity.id=TrackPoint.activity_id""")
     users_dict = {}
@@ -161,12 +161,12 @@ def query9(program):
         # If current trackpoint has a higher altitude value than the last trackpoint, 
         # and they belong to the same activity, add to user's total
         if(current_alt != -777 and prev_alt != -777 and current_alt > prev_alt and current_activity == prev_activity):
-            users_dict[user_id] = users_dict[user_id] + (current_alt - prev_alt)
+            users_dict[user_id] = users_dict[user_id] + ((current_alt - prev_alt)/3.281)
 
     # Find top 15 users who have gained the most altitude meters
     top_15 = []
     for i in range(15):
-        most_alt_gained = (max(users_dict, key=users_dict.get), (max(users_dict.values())/3.281))
+        most_alt_gained = (max(users_dict, key=users_dict.get), max(users_dict.values()))
         top_15.append(most_alt_gained)
         del users_dict[max(users_dict, key=users_dict.get)]
 
@@ -194,6 +194,7 @@ def main():
     program = None
     try:
         program = task2()
+        query9(program)
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
