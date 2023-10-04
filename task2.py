@@ -27,7 +27,7 @@ class task2:
         rows = self.cursor.fetchall()
         print(tabulate(rows, headers=self.cursor.column_names)+ "\n")
 
-    def execute_sql_query_tabulated(self, query):
+    def execute_sql_query(self, query):
         self.cursor.execute(query)
         rows = self.cursor.fetchall()
 
@@ -58,7 +58,7 @@ def query4(program):
         print("--- Query 4 ---\n")
         # Users with bus as transportation mode
         print("Users with bus as transportation mode:")
-        program.execute_sql_query_tabulated("SELECT DISTINCT user_id FROM Activity WHERE transportation_mode = 'bus'")
+        program.execute_sql_query("SELECT DISTINCT user_id FROM Activity WHERE transportation_mode = 'bus'")
 
 def query7(program):
         print("--- Query 7 ---\n")
@@ -67,7 +67,7 @@ def query7(program):
         program.execute_sql_query_raw("SELECT COUNT(DISTINCT user_id) FROM Activity WHERE DATE(start_date_time) != DATE(end_date_time)")
         
         print("Users that have started an activity in one day and ended the activity the next day, by transportation mode and descending duration:")
-        program.execute_sql_query_tabulated("""
+        program.execute_sql_query("""
                                            SELECT user_id, transportation_mode, TIMEDIFF(end_date_time, start_date_time) AS duration 
                                             FROM Activity WHERE DATE(start_date_time) != DATE(end_date_time) 
                                             AND transportation_mode IS NOT NULL 
@@ -112,8 +112,6 @@ def query10(program):
                 if data[1] > max_distances[data[2]][1]:
                     max_distances[data[2]] = data
             
-            #print(f"Activity ID: {data[0]}, Total Distance: {data[1]:.2f} km, Transportation Mode: {data[2]}")
-
         print("Max distances for each transportation mode \n")
         for key in max_distances:
             print(f"User ID: {max_distances[key][0]}, Total Distance: {max_distances[key][1]:.2f} km, Transportation Mode: {max_distances[key][2]}")
