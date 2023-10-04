@@ -63,7 +63,7 @@ def query1(program):
 def query3(program):
     print("--- Query 3 ---\n")
 
-    program.execute_sql_query("""SELECT user_id, COUNT(user_id) AS 'Number of activities' 
+    program.execute_sql_query("""SELECT user_id, COUNT(user_id) AS 'number_of_activities' 
     FROM Activity 
     GROUP BY user_id 
     ORDER BY COUNT(user_id) DESC 
@@ -194,7 +194,7 @@ def main():
     program = None
     try:
         program = task2()
-        query12(program)
+        query3(program)
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
