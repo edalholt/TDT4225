@@ -170,7 +170,7 @@ def query9(program):
         top_15.append(most_alt_gained)
         del users_dict[max(users_dict, key=users_dict.get)]
 
-    print(tabulate(top_15, headers=["user_id", "total altitude meters gained"]))
+    print(tabulate(top_15, headers=["user_id", "total_altitude_meters_gained"]))
 
 def query12(program):
     print("--- Query 12 ---\n")
@@ -194,7 +194,7 @@ def main():
     program = None
     try:
         program = task2()
-        query3(program)
+        query9(program)
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
