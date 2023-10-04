@@ -75,12 +75,12 @@ A Python script was made to create the database, as suggested in the assignment 
 ### Solution to task 2:
 -
 
-Did differently:
+#### Did differently:
 - Activity ID is string instead of an integer (which was suggested in the assignment sheet). This is because trackpoints need a foreign key to activity. When inserting trackpoints into the database, it is necessary to know the ID of the activity the trackpoint belongs to. This is not possible if the ID is auto generated. In order to always be able to infer the activity ID, the group opted for a solution where the activity ID is the combination of the start time and the user's ID. The user ID is a string; therefore, the activity ID has to be a string as well. This worked well, and the group did not experience any issues related to the change.
 - Float is used instead of double, as Python does not have double as an in-built data type.
 
 #### What we learned:
-- 
+- Batching is convenient when inserting lots of data.
 
 
 ## Feedback
