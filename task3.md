@@ -62,5 +62,9 @@ Did differently:
 - Float is used instead of double, as Python does not have double as an in-built data type.
 
 
+What we learned:
+- 
+
+
 ## Feedback
 Optional - give us feedback on the task if you have any. The assignment is new this semester and we would love to improve if there were any problems.
