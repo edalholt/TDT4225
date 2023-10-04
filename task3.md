@@ -11,7 +11,7 @@ The group met in person to work on the task. Four meetings were held. In task 1,
 Git repository: xxx
 
 ## Results
-Add your results from the tasks, both as text and screenshots. Short sentences are sufficient.
+The results from the tasks can be found below. For task 1, screenshots of the first ten rows from each table has been provided. For task 2, all results, as well as a description of how the questions were solved, are included.
 
 ### Task 1: 
 First ten rows from User: \
