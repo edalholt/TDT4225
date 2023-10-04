@@ -48,6 +48,10 @@ Question 11:
 
 Question 12: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/c1324b5f-79a2-4fb9-a94e-8999b510200d)
+![image](https://github.com/edalholt/TDT4225/assets/69513928/ece024dd-ad66-42bb-bc21-709574a06581)
+![image](https://github.com/edalholt/TDT4225/assets/69513928/4242397f-948f-4a3d-bcfb-f95b96515f28)
+
+
 
 Used rank function described here: https://www.sqlshack.com/overview-of-sql-rank-functions/ to rank every transportation mode on how often they are used for every user. Then, the top 1 most frequently used transportation mode is chosen for every user. Users who don’t register transportation modes are not included.
 
