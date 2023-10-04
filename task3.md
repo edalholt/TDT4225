@@ -37,6 +37,8 @@ Question 4:
 Question 5: 
 
 Question 6: \
+![image](https://github.com/edalholt/TDT4225/assets/69513928/47481399-661b-4e91-be8b-2a7ee576fc15)
+
 Grouped user_id, start_date_time and end_date_time. Counted how many elements are in each group. If a group has more than one element, it means that the same activity has been registered multiple times. The query gave zero results, meaning that no activities were registered multiple times. 
 
 Question 7: 
