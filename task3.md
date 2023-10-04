@@ -21,30 +21,31 @@ showing top 10 rows from all of your tables is sufficient
 ### Task 2:
 (Add pictures of code and results, describe briefly)
 
-Question 1:
+Question 1: \
 
-Question 2:
+Question 2: \
 
-Question 3:
+Question 3: \
 Count how many times each user_id appears in the Activity table. The user_id that appears the most must belong to the user with the most activities. Retrieve the 15 users with the most activities.
 
-Question 4:
+Question 4: \
 
-Question 5:
+Question 5: \
 
-Question 6:
+Question 6: \
+Group user_id, start_date_time and end_date_time. Count how many elements are in each group. If a group has more than one element, it means that the same activity has been registered multiple times. The query gave zero results, meaning that no activities were registered multiple times. 
 
-Question 7:
+Question 7: \
 
-Question 8:
+Question 8: \
 
-Question 9:
+Question 9: \
 
-Question 10:
+Question 10: \
 
-Question 11:
+Question 11: \
 
-Question 12:
+Question 12: \
 Used rank function described here: https://www.sqlshack.com/overview-of-sql-rank-functions/ to rank every transportation mode on how often they are used for every user. Then, the top 1 most frequently used transportation mode is chosen for every user. Users who don’t register transportation modes are not included.
 
 ## Discussion
