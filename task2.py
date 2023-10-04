@@ -40,13 +40,23 @@ class task2:
         return rows
 
 def query3(program):
-    program.execute_sql_query("SELECT user_id, COUNT(user_id) AS 'Number of activities' FROM Activity GROUP BY user_id ORDER BY COUNT(user_id) DESC LIMIT 15")
+    program.execute_sql_query("""SELECT user_id, COUNT(user_id) AS 'Number of activities' 
+    FROM Activity 
+    GROUP BY user_id 
+    ORDER BY COUNT(user_id) DESC 
+    LIMIT 15""")
 
 def query6(program):
-    program.execute_sql_query("SELECT user_id, start_date_time, end_date_time, COUNT(*) as count FROM Activity GROUP BY user_id, start_date_time, end_date_time HAVING count > 1")
+    program.execute_sql_query("""SELECT user_id, start_date_time, end_date_time, COUNT(*) as count 
+    FROM Activity 
+    GROUP BY user_id, start_date_time, end_date_time 
+    HAVING count > 1""")
 
 def query9(program):
-    rows = program.execute_sql_no_print("SELECT altitude, Activity.id AS activity_id, TrackPoint.id AS tp_id, Activity.user_id AS user_id FROM Activity INNER JOIN TrackPoint ON Activity.id=TrackPoint.activity_id")
+    rows = program.execute_sql_no_print("""SELECT altitude, Activity.id AS activity_id, 
+    TrackPoint.id AS tp_id, Activity.user_id AS user_id 
+    FROM Activity 
+    INNER JOIN TrackPoint ON Activity.id=TrackPoint.activity_id""")
     users_dict = {}
     for row in range (1, len(rows)):
         user_id = rows[row][-1]
@@ -94,7 +104,7 @@ def main():
     try:
         program = task2()
         program.show_tables()
-        
+
     except Exception as e:
         print("ERROR: Failed to use database:", e)
     finally:
