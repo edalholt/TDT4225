@@ -46,6 +46,8 @@ Question 7:
 Question 8: 
 
 Question 9: \
+![image](https://github.com/edalholt/TDT4225/assets/69513928/e7915917-c6a0-402d-acae-632332b4b448)
+
 Retrieved all altitudes, activity id’s and user id’s from Activity and TrackPoint. In a dictionary, stored every user’s gain of altitude meters. Iterated over every row from the result of the query. If a TrackPoint’s altitude was higher than the previous TrackPoint’s, and they belonged to the same activity, it meant that the user has gained altitude. Added this to the user’s sum of gained altitude meters. When this was done for all TrackPoints, found the 15 users who had gained the most altitude meters.
 
 The results show the 15 users who have gained the most altitude meters and how many altitude meters they have gained.
