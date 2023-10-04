@@ -21,9 +21,9 @@ showing top 10 rows from all of your tables is sufficient
 ### Task 2:
 (Add pictures and results, describe briefly)
 
-Question 1: 
+#### Question 1: 
 
-Question 2: 
+#### Question 2: 
 
 Question 3: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/57031213-8281-4c20-ad91-8ac1d17c3363)
