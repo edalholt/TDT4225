@@ -4,8 +4,6 @@ Group: 36 \
 Students: Eivind Dalholt, Vegard Henriksen and Synne Ødegaard
 
 ## Introduction
-Briefly explain the task and the problems you have solved. How did you work as a group? If you used Git, a link to the repository would be nice.
-
 The exercise was based on the Geodata GPS Trajectory dataset. First, the dataset had to be cleaned and inserted into a MySQL database, created by the group. Then, SQL queries and Python code were used to manipulate the data in order to answer questions. The answers can be found under Results.
 
 The group met in person to work on the task. Four meetings were held. In task 1, different group members worked on different parts of the task. This was done because it seemed efficient, as the task consisted of two distinct tasks: creating the database and data cleaning. In  task 2, the questions were divided among the group members. Each member answered four questions. All group members participated in writing the report.
