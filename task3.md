@@ -42,6 +42,8 @@ Question 8:
 Question 9: \
 Retrieve all altitudes, activity id’s and user id’s from Activity and TrackPoint. In a dictionary, store every user’s gain of altitude meters. Iterate over every row from the result of the query. If a TrackPoint’s altitude is higher than the previous TrackPoint’s, and they belong to the same activity, it means that the user has gained altitude. Add this to the user’s sum of gained altitude meters. When this has been done for all TrackPoints, find the 15 users who have gained the most altitude meters.
 
+The results show the 15 users who have gained the most altitude meters and how many altitude meters they have gained.
+
 Question 10: 
 
 Question 11: 
@@ -53,6 +55,8 @@ Question 12: \
 
 
 Used rank function described here: https://www.sqlshack.com/overview-of-sql-rank-functions/ to rank every transportation mode on how often they are used for every user. Then, the top 1 most frequently used transportation mode is chosen for every user. Users who don’t register transportation modes are not included.
+
+The results show all users who have registered a transportation mode and their most used transportation mode, sorted on user_id.
 
 ## Discussion
 Discuss your solutions. Did you do anything differently than how it was explained in the assignment sheet, in that case why and how did that work? Were there any pain points or problems? What did you learn from this assignment?
