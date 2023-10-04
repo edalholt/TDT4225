@@ -8,7 +8,7 @@ Briefly explain the task and the problems you have solved. How did you work as a
 
 The exercise was based on the Geodata GPS Trajectory dataset. First, the dataset had to be cleaned and inserted into a MySQL database, created by the group. Then, SQL queries and Python code were used to manipulate the data in order to answer questions. The answers can be found under Results.
 
-The group met in person to work on the task. X meetings were held. In task 1, different group members worked on different parts of the task. This was done because it seemed efficient, as the task consisted of two distinct tasks: creating the database and data cleaning.
+The group met in person to work on the task. X meetings were held. In task 1, different group members worked on different parts of the task. This was done because it seemed efficient, as the task consisted of two distinct tasks: creating the database and data cleaning. In  task 2, the questions were divided among the group members. Each member answered four questions. All group members participated in writing the report.
 
 Git repository: xxx
 
@@ -34,5 +34,3 @@ Did differently:
 
 ## Feedback
 Optional - give us feedback on the task if you have any. The assignment is new this semester and we would love to improve if there were any problems.
-
-It would be nice to know what's important to the evaluation (code quality, how fast the code runs, how detailed the report should be etc)
