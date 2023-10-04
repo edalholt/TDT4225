@@ -96,7 +96,7 @@ def query12(program):
         )
         SELECT id, transportation_mode
         FROM MostFrequent
-        WHERE most_frequent = 1;
+        WHERE most_frequent = 1
     """)
 
 def main():
