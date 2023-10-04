@@ -26,7 +26,11 @@ Question 1:
 Question 2: 
 
 Question 3: \
+![image](https://github.com/edalholt/TDT4225/assets/69513928/57031213-8281-4c20-ad91-8ac1d17c3363)
+
 Count how many times each user_id appears in the Activity table. The user_id that appears the most must belong to the user with the most activities. Retrieve the 15 users with the most activities.
+
+The results show the top 15 users with the most registered activities and how many activities they have registered.
 
 Question 4: 
 
