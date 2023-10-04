@@ -39,7 +39,8 @@ Question 7:
 
 Question 8: 
 
-Question 9: 
+Question 9: \
+Retrieve all altitudes, activity id’s and user id’s from Activity and TrackPoint. In a dictionary, store every user’s gain of altitude meters. Iterate over every row from the result of the query. If a TrackPoint’s altitude is higher than the previous TrackPoint’s, and they belong to the same activity, it means that the user has gained altitude. Add this to the user’s sum of gained altitude meters. When this has been done for all TrackPoints, find the 15 users who have gained the most altitude meters.
 
 Question 10: 
 
