@@ -80,7 +80,8 @@ A Python script was made to create the database, as suggested in the assignment 
 - Float is used instead of double, as Python does not have double as an in-built data type.
 
 #### What we learned:
-- Batching is convenient when inserting lots of data.
+- Batching is convenient when inserting lots of data. Batching greatly improved our data insert times.
+- How to use Pandas. Pandas proved to be convenient when iterating over the results of a query.
 
 
 ## Feedback
