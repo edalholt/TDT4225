@@ -177,15 +177,15 @@ def query12(program):
 
     program.execute_sql_query("""WITH MostFrequent AS (
             SELECT
-                User.id,
-                transportation_mode,
+                User.id AS user_id,
+                transportation_mode AS most_used_transportation_mode,
                 RANK() OVER (PARTITION BY User.id ORDER BY COUNT(*) DESC) AS most_frequent
             FROM User
             INNER JOIN Activity ON User.id = Activity.user_id
             WHERE transportation_mode IS NOT NULL
             GROUP BY User.id, transportation_mode
         )
-        SELECT id, transportation_mode
+        SELECT user_id, most_used_transportation_mode
         FROM MostFrequent
         WHERE most_frequent = 1
     """)
@@ -194,7 +194,7 @@ def main():
     program = None
     try:
         program = task2()
-        query9(program)
+        query12(program)
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
