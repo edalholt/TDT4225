@@ -82,7 +82,7 @@ A Python script was made to create the database, as suggested in the assignment 
 #### What we learned:
 - Batching is convenient when inserting lots of data. Batching greatly improved our data insert times.
 - How to use Pandas. Pandas proved to be convenient when iterating over the results of a query.
-- The division of questions resulted in all members .....
+- The division of questions resulted in all members getting to learn how to write queries and code for very large data volumes.
 
 
 ## Feedback
