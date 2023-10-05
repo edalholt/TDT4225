@@ -176,76 +176,80 @@ def query8(program):
             'date_time': row['date_time']
         })
 
-        # Filter out non overlapping activities to reduce comparisons.
-        overlapping_activity_pairs = []
-        users = list(user_activities.keys())
-        print("Filtering out non overlapping activities...")
-        for index, cur_user in enumerate(users):
-            for activity_id1, activity_data1 in user_activities[cur_user].items():
-                start_time1 = activity_data1['start_time']
-                end_time1 = activity_data1['end_time']
-                for next_user in users[index + 1:]:
-                    for activity_id2, activity_data2 in user_activities[next_user].items():
-                        start_time2 = activity_data2['start_time']
-                        end_time2 = activity_data2['end_time']
-                        if (start_time1 <= end_time2) and (start_time2 <= end_time1):
-                            overlap_start = pd.to_datetime(max(start_time1, start_time2))
-                            overlap_end = pd.to_datetime(min(end_time1, end_time2))
-                            overlapping_activity_pairs.append(
-                                (cur_user, activity_id1, next_user, activity_id2, overlap_start, overlap_end))
+    # Filter out non overlapping activities to reduce comparisons.
+    overlapping_activity_pairs = []
+    users = list(user_activities.keys())
+    print("Filtering out non overlapping activities...")
+    for index, cur_user in enumerate(users):
+        for activity_id1, activity_data1 in user_activities[cur_user].items():
+            start_time1 = activity_data1['start_time']
+            end_time1 = activity_data1['end_time']
+            for next_user in users[index + 1:]:
+                for activity_id2, activity_data2 in user_activities[next_user].items():
+                    start_time2 = activity_data2['start_time']
+                    end_time2 = activity_data2['end_time']
+                    if (start_time1 <= end_time2) and (start_time2 <= end_time1):
+                        overlap_start = pd.to_datetime(max(start_time1, start_time2))
+                        overlap_end = pd.to_datetime(min(end_time1, end_time2))
+                        overlapping_activity_pairs.append(
+                            (cur_user, activity_id1, next_user, activity_id2, overlap_start, overlap_end))
 
-        # Find users who have been close in both space and time.
-        close_users = set()
-        total_pairs = len(overlapping_activity_pairs)
-        for index, (cur_user, activity_id1, next_user, activity_id2, overlap_start, overlap_end) in enumerate(
-                overlapping_activity_pairs):
-            print(f"Processing pair {index + 1} of {total_pairs}...")
-            # Early exit if the pair has already been found to be close.
-            if tuple(sorted([cur_user, next_user])) in close_users:
-                continue
-            # Get trackpoints for the overlapping period, sorted for faster lookup.
-            activity1_trackpoints = sorted([tp for tp in user_activities[cur_user][activity_id1]['trackpoints']
-                                            if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end],
-                                           key=lambda tp: tp['date_time'])
+    # Find users who have been close in both space and time.
+    close_users = set()
+    total_pairs = len(overlapping_activity_pairs)
+    for index, (cur_user, activity_id1, next_user, activity_id2, overlap_start, overlap_end) in enumerate(
+            overlapping_activity_pairs):
+        print(f"Processing pair {index + 1} of {total_pairs}...")
+        # Early exit if the pair has already been found to be close.
+        if tuple(sorted([cur_user, next_user])) in close_users:
+            continue
+        # Get trackpoints for the overlapping period, sorted for faster lookup.
+        activity1_trackpoints = sorted([tp for tp in user_activities[cur_user][activity_id1]['trackpoints']
+                                        if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end],
+                                       key=lambda tp: tp['date_time'])
 
-            activity2_trackpoints = sorted([tp for tp in user_activities[next_user][activity_id2]['trackpoints']
-                                            if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end],
-                                           key=lambda tp: tp['date_time'])
+        activity2_trackpoints = sorted([tp for tp in user_activities[next_user][activity_id2]['trackpoints']
+                                        if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end],
+                                       key=lambda tp: tp['date_time'])
 
-            found_close = False
-            j = 0
-            for trackpoint1 in activity1_trackpoints:
-                if found_close:
-                    break
-                while j < len(activity2_trackpoints):
-                    time_diff = abs(pd.to_datetime(trackpoint1['date_time']) - pd.to_datetime(
-                        activity2_trackpoints[j]['date_time']))
+        found_close = False
+        j = 0
+        for trackpoint1 in activity1_trackpoints:
+            if found_close:
+                break
+            while j < len(activity2_trackpoints):
+                time_diff = abs(pd.to_datetime(trackpoint1['date_time']) - pd.to_datetime(
+                    activity2_trackpoints[j]['date_time']))
 
-                    if time_diff.seconds > 30:
-                        j += 1
-                        continue
-
-                    cord1 = (trackpoint1['lat'], trackpoint1['lon'])
-                    cord2 = (activity2_trackpoints[j]['lat'], activity2_trackpoints[j]['lon'])
-                    distance = haversine(cord1, cord2, unit="m")
-
-                    if distance <= 50:
-                        close_users.add(tuple(sorted([cur_user, next_user])))
-                        print(
-                            f"Closer users found! Match between {cur_user} (activity {activity_id1}) and {next_user} (activity {activity_id2})")
-                        found_close = True
-                        break
+                if time_diff.seconds > 30:
                     j += 1
+                    continue
 
-        # Print results.
-        close_users_dict = defaultdict(set)
-        for user1, user2 in close_users:
-            close_users_dict[user1].add(user2)
-            close_users_dict[user2].add(user1)
+                cord1 = (trackpoint1['lat'], trackpoint1['lon'])
+                cord2 = (activity2_trackpoints[j]['lat'], activity2_trackpoints[j]['lon'])
+                distance = haversine(cord1, cord2, unit="m")
 
-        for user, close_to in close_users_dict.items():
-            sorted_matches = sorted(close_to, key=lambda x: int(x))
-            print(f"User {user} has been close to users: {', '.join(sorted_matches)}")
+                if distance <= 50:
+                    close_users.add(tuple(sorted([cur_user, next_user])))
+                    print(f"Closer users found! Match between {cur_user} (activity {activity_id1}) and {next_user} (activity {activity_id2}.)")
+                    print(f"User {cur_user} has trackpoint {trackpoint1['date_time']} at {cord1}. User {next_user} has trackpoint {activity2_trackpoints[j]['date_time']} at {cord2}. Distance: {distance:.2f} meters.")
+                    found_close = True
+                    break
+                j += 1
+
+    # Print results.
+    close_users_dict = defaultdict(set)
+    for user1, user2 in close_users:
+        close_users_dict[user1].add(user2)
+        close_users_dict[user2].add(user1)
+
+    # Sort the users by their ID in ascending order
+    sorted_users = sorted(close_users_dict.keys(), key=lambda x: int(x))
+
+    for user in sorted_users:
+        sorted_matches = sorted(close_users_dict[user],
+                                key=lambda x: int(x))
+        print(f"User {user} has been close to users: {', '.join(sorted_matches)}")
 
 
 def query9(program):
@@ -369,6 +373,7 @@ def main():
     program = None
     try:
         program = task2()
+        query8(program)
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
