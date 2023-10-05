@@ -186,8 +186,10 @@ def query8(program):
 
             activity2_trackpoints = [tp for tp in user_activities[next_user][activity_id2]['trackpoints']
                                      if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end]
-            # Inefficient comparison of trackpoints.
+            found_close = False
             for trackpoint1 in activity1_trackpoints:
+                if found_close:
+                    break
                 for trackpoint2 in activity2_trackpoints:
                     time_diff = abs(pd.to_datetime(trackpoint1['date_time']) - pd.to_datetime(trackpoint2['date_time']))
                     if time_diff.seconds <= 30:
@@ -197,7 +199,9 @@ def query8(program):
                         if distance <= 50:
                             close_users.add(tuple(sorted([cur_user, next_user])))
                             print(f"Closer users found! Match between {cur_user} and {next_user}")
+                            found_close = True
                             break
+
         close_users_dict = defaultdict(set)
         for user1, user2 in close_users:
             close_users_dict[user1].add(user2)
@@ -213,10 +217,7 @@ def query8(program):
 
     except (FileNotFoundError, ValueError, json.JSONDecodeError):
         # If there's any issue with the file or its contents, compute the data from scratch
-        df = pd.read_csv("stupid_solution.csv")
-        df['date_time'] = pd.to_datetime(df['date_time'])
-        df['activity_start_time'] = pd.to_datetime(df['activity_start_time'])
-        df['activity_end_time'] = pd.to_datetime(df['activity_end_time'])
+        df = pd.read_csv("stupid_slution.csv")
         user_activities = {}
         for _, row in df.iterrows():
             user_id = row['user']
