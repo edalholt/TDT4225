@@ -24,11 +24,14 @@ First ten rows from TrackPoint:
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/03e101d4-e1af-47a8-9bce-6e8c11bfe361)
 
 ### Task 2:
+
 (Add pictures and results, describe briefly)
 
 Question 1: 
 
 Question 2: 
+In this query we created a CTE out of the activity data joined with TrackPoints.
+We then selected trackpoints from this table and used the AVG, MIN and MAX functions to answer the query.
 
 Question 3: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/57031213-8281-4c20-ad91-8ac1d17c3363)
@@ -40,6 +43,8 @@ The results show the top 15 users with the most registered activities and how ma
 Question 4: 
 
 Question 5: 
+Simply counted the number of unique transportation modes each user had (filtered out NULL.)
+Then ordered by unique modes in descending order and limited the result to 10.
 
 Question 6: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/47481399-661b-4e91-be8b-2a7ee576fc15)
@@ -49,6 +54,11 @@ Grouped user_id, start_date_time and end_date_time. Counted how many elements ar
 Question 7: 
 
 Question 8: 
+This proved to be the most tricky query of them all simply. Initially we had a query that first found overlapping activities.
+Then we found the overlap between two users and used this to find the corresponding trackponts. Then we set a condition to join where the trackpoints were within a 30 second interval.
+However, due to the number of joins performed, we never saw this query finish due to the sheer amount of data.
+
+Instead, we returned all the data from the database, created dictionaries from it, and then used pandas and python to parse and find users who had been close in time and space.
 
 Question 9: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/e7915917-c6a0-402d-acae-632332b4b448)
@@ -60,6 +70,10 @@ The results show the 15 users who have gained the most altitude meters and how m
 Question 10: 
 
 Question 11: 
+For this query we again created a CTE out of the activity data joined with TrackPoints.
+We then performed a self join on this newly created table where the user_id was the same, but the trackpoint id was incremented by one.
+We then checked if the time between the two trackpoints was more than 5 minutes, in which case we deemed it invalid.
+Then we just counted this and grouped by user_id and invalid activities in a descending order.
 
 Question 12: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/ece024dd-ad66-42bb-bc21-709574a06581)
