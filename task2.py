@@ -1,5 +1,8 @@
+from collections import defaultdict
+
 import haversine as hs
 import pandas as pd
+from haversine import haversine
 from tabulate import tabulate
 
 from DbConnector import DbConnector
@@ -137,6 +140,114 @@ def query7(program):
                                         ORDER BY duration DESC""")
 
 
+def query8(program):
+    print("--- Query 8 ---\n")
+    """
+    Warning: This query takes a while to execute and to collect the results.
+    """
+    query = """
+        SELECT  user_id as user, Activity.id as activity_id, start_date_time as activity_start_time,
+                end_date_time as activity_end_time, TrackPoint.id as trackpoint_id, lat, lon, date_time
+        FROM Activity
+        INNER JOIN TrackPoint ON Activity.id = TrackPoint.activity_id
+        """
+
+    df = pd.read_sql_query(query, program.db_connection)
+
+    # Create dict for lookups.
+    user_activities = {}
+    for _, row in df.iterrows():
+        user_id = row['user']
+        activity_id = row['activity_id']
+        start_time = row['activity_start_time']
+        end_time = row['activity_end_time']
+        if user_id not in user_activities:
+            user_activities[user_id] = {}
+
+        if activity_id not in user_activities[user_id]:
+            user_activities[user_id][activity_id] = {
+                'start_time': start_time,
+                'end_time': end_time,
+                'trackpoints': []
+            }
+        user_activities[user_id][activity_id]['trackpoints'].append({
+            'lat': row['lat'],
+            'lon': row['lon'],
+            'date_time': row['date_time']
+        })
+
+        # Filter out non overlapping activities to reduce comparisons.
+        overlapping_activity_pairs = []
+        users = list(user_activities.keys())
+        print("Filtering out non overlapping activities...")
+        for index, cur_user in enumerate(users):
+            for activity_id1, activity_data1 in user_activities[cur_user].items():
+                start_time1 = activity_data1['start_time']
+                end_time1 = activity_data1['end_time']
+                for next_user in users[index + 1:]:
+                    for activity_id2, activity_data2 in user_activities[next_user].items():
+                        start_time2 = activity_data2['start_time']
+                        end_time2 = activity_data2['end_time']
+                        if (start_time1 <= end_time2) and (start_time2 <= end_time1):
+                            overlap_start = pd.to_datetime(max(start_time1, start_time2))
+                            overlap_end = pd.to_datetime(min(end_time1, end_time2))
+                            overlapping_activity_pairs.append(
+                                (cur_user, activity_id1, next_user, activity_id2, overlap_start, overlap_end))
+
+        # Find users who have been close in both space and time.
+        close_users = set()
+        total_pairs = len(overlapping_activity_pairs)
+        for index, (cur_user, activity_id1, next_user, activity_id2, overlap_start, overlap_end) in enumerate(
+                overlapping_activity_pairs):
+            print(f"Processing pair {index + 1} of {total_pairs}...")
+            # Early exit if the pair has already been found to be close.
+            if tuple(sorted([cur_user, next_user])) in close_users:
+                continue
+            # Get trackpoints for the overlapping period, sorted for faster lookup.
+            activity1_trackpoints = sorted([tp for tp in user_activities[cur_user][activity_id1]['trackpoints']
+                                            if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end],
+                                           key=lambda tp: tp['date_time'])
+
+            activity2_trackpoints = sorted([tp for tp in user_activities[next_user][activity_id2]['trackpoints']
+                                            if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end],
+                                           key=lambda tp: tp['date_time'])
+
+            found_close = False
+            j = 0
+            for trackpoint1 in activity1_trackpoints:
+                if found_close:
+                    break
+                while j < len(activity2_trackpoints):
+                    time_diff = abs(pd.to_datetime(trackpoint1['date_time']) - pd.to_datetime(
+                        activity2_trackpoints[j]['date_time']))
+
+                    if time_diff.seconds > 30:
+                        j += 1
+                        continue
+
+                    cord1 = (trackpoint1['lat'], trackpoint1['lon'])
+                    cord2 = (activity2_trackpoints[j]['lat'], activity2_trackpoints[j]['lon'])
+                    distance = haversine(cord1, cord2, unit="m")
+
+                    if distance <= 50:
+                        close_users.add(tuple(sorted([cur_user, next_user])))
+                        print(
+                            f"Closer users found! Match between {cur_user} (activity {activity_id1}) and {next_user} (activity {activity_id2})")
+                        found_close = True
+                        break
+                    j += 1
+
+        # Print results.
+        close_users_dict = defaultdict(set)
+        for user1, user2 in close_users:
+            close_users_dict[user1].add(user2)
+            close_users_dict[user2].add(user1)
+
+        for user, close_to in close_users_dict.items():
+            sorted_matches = sorted(close_to, key=lambda x: int(x))
+            print(f"User {user} has been close to users: {', '.join(sorted_matches)}")
+
+
 def query9(program):
     rows = program.execute_sql_no_print("""SELECT altitude, Activity.id AS activity_id, 
     TrackPoint.id AS tp_id, Activity.user_id AS user_id 
@@ -220,18 +331,18 @@ def query10(program):
 def query11(program):
     print("--- Query 11 ---\n")
     query11 = """
-        WITH UserTrackPoints AS (
-            SELECT user_id, TrackPoint.id as track_point_id, date_time
-            FROM Activity
-            INNER JOIN TrackPoint ON Activity.id = TrackPoint.activity_id
-            )
-            SELECT a.user_id,  COUNT(DISTINCT (a.track_point_id)) AS invalid_trackpoints
-            FROM UserTrackPoints a
-            JOIN UserTrackPoints b ON a.track_point_id = b.track_point_id + 1 AND a.user_id = b.user_id
-            WHERE ABS(TIMESTAMPDIFF(MINUTE , a.date_time, b.date_time)) >= 5  
-            GROUP BY a.user_id
-            ORDER BY invalid_trackpoints DESC
-    """
+           WITH UserTrackPoints AS (
+               SELECT user_id, TrackPoint.id as track_point_id, date_time, activity_id
+               FROM Activity
+               INNER JOIN TrackPoint ON Activity.id = TrackPoint.activity_id
+               )
+               SELECT a.user_id,  COUNT(DISTINCT (a.activity_id)) AS invalid_activities
+               FROM UserTrackPoints a
+               JOIN UserTrackPoints b ON a.track_point_id = b.track_point_id + 1 AND a.user_id = b.user_id
+               WHERE ABS(TIMESTAMPDIFF(MINUTE , a.date_time, b.date_time)) >= 5  
+               GROUP BY a.user_id
+               ORDER BY invalid_activities DESC
+       """
     program.execute_sql_query(query11)
 
 
