@@ -1,7 +1,7 @@
 from DbConnector import DbConnector
 from tabulate import tabulate
 import pandas as pd
-import haversine as hs
+from haversine import haversine, Unit
 
 
 class task2:
@@ -141,6 +141,55 @@ def query10(program):
     for key in max_distances:
         print(f"User ID: {max_distances[key][0]}, Total Distance: {max_distances[key][1]:.2f} km, Transportation Mode: {max_distances[key][2]}")
 
+def query8(program):
+    print("--- Query 8 ---\n")
+
+    df = pd.read_sql_query("""SELECT TP.activity_id, TP.lat, TP.lon, TP.date_time, A.user_id 
+                           FROM TrackPoint as TP 
+                           JOIN (
+                           SELECT id, user_id
+                           FROM Activity) as A 
+                           ON A.id = TP.activity_id""", program.db_connection)
+
+    user_grouped = df.groupby('user_id').agg({'lat': list, 'lon': list, 'date_time': list}).reset_index()
+
+    print("Data Fetched, starting comparison \n")
+
+    result = []
+    iteration = 0
+
+    # Iterate through each user and compare with other users
+    for i in range(len(user_grouped)):
+        iteration += 1
+        print(f"User {iteration} out of {len(user_grouped)}")
+
+        group1 = user_grouped.iloc[i]
+        for j in range(i + 1, len(user_grouped)):
+            group2 = user_grouped.iloc[j]
+
+            for (lat1, lon1, date_time1), (lat2, lon2, date_time2) in zip(
+                    zip(group1['lat'], group1['lon'], group1['date_time']),
+                    zip(group2['lat'], group2['lon'], group2['date_time'])
+            ):
+                
+                # Distance between two points in meters - Using Harvesine formula
+                distance = haversine((lat1, lon1), (lat2, lon2), Unit.METERS)
+
+                # Calculate time difference in seconds
+                time_diff = (date_time1 - date_time2).total_seconds()
+
+                # Check if distance is less than 50 meters, time difference is less than 30 seconds
+                if distance < 50 and abs(time_diff) < 30:
+                    result.append((group1['user_id'], group2['user_id']))
+                    print(f"Match: {group1['user_id']} and {group2['user_id']}")
+                    break
+
+    if result:
+        print("User pairs found:")
+        print(tabulate(result, headers=["user1", "user2"]))
+    else:
+        print("No user pairs found.") 
+
 def query9(program):
     rows = program.execute_sql_no_print("""SELECT altitude, Activity.id AS activity_id, 
     TrackPoint.id AS tp_id, Activity.user_id AS user_id 
@@ -194,6 +243,8 @@ def main():
     program = None
     try:
         program = task2()
+        query8(program)
+
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
