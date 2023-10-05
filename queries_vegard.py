@@ -1,6 +1,5 @@
-from multiprocessing import Pool, cpu_count
+import json
 
-import numpy as np
 import pandas as pd
 from haversine import haversine
 from tabulate import tabulate
@@ -131,43 +130,131 @@ def query8(program):
             t2.date_time BETWEEN o.overlap_start AND o.overlap_end
         AND
             ABS(TIMESTAMPDIFF(SECOND, t1.date_time, t2.date_time)) <= 30
-        AND
-            ST_DISTANCE_SPHERE(POINT(t1.lon,t1.lat), POINT(t2.lon, t2.lat)) <= 50
-            LIMIT 100000
             
     """)
-    df = pd.read_sql_query(query_entire, program.db_connection)
+    # df = pd.read_sql_query(query_entire, program.db_connection)
+    # df.to_csv("EDS.csv", index=False)
 
-    #df = pd.read_csv("pls_work.csv.csv")
+    query = """
+    SELECT  user_id as user, Activity.id as activity_id, start_date_time as activity_start_time,
+            end_date_time as activity_end_time, TrackPoint.id as trackpoint_id, lat, lon, date_time
+    FROM Activity
+    INNER JOIN TrackPoint ON Activity.id = TrackPoint.activity_id
+    """
 
-    processed = 0
-    total = len(df)
-    close_users = set()
-    for _, row in df.iterrows():
-        user_pair = tuple(sorted([row["user1_id"], row["user2_id"]]))
-        if user_pair in close_users:
-            processed += 1
-            continue
-        coords1 = (row["trackpoint1_lat"], row["trackpoint1_lon"])
-        coords2 = (row["trackpoint2_lat"], row["trackpoint2_lon"])
-        distance = haversine(coords1, coords2, unit="m")
-        if distance <= 50:
-            close_users.add(user_pair)
-            processed += 1
-        print(f"Processed {processed}/{total} rows", end="\r")
-    print(close_users)
+    # df = pd.read_sql_query(query, program.db_connection)
+    # df.to_csv("stupid_solution.csv", index=False)
+
+    try:
+        with open('user_activities.json', 'r') as file:
+            user_activities = json.load(file)
+        if not user_activities:
+            raise ValueError("The dictionary is empty.")
+        print("Dictionary loaded from file.")
+
+        # Filter out non overlapping activities to reduce comparisons.
+        overlapping_activity_pairs = []
+        users = list(user_activities.keys())
+        print("Filtering out non overlapping activities...")
+        for index, cur_user in enumerate(users):
+            for activity_id1, activity_data1 in user_activities[cur_user].items():
+                start_time1 = activity_data1['start_time']
+                end_time1 = activity_data1['end_time']
+                for next_user in users[index + 1:]:
+                    for activity_id2, activity_data2 in user_activities[next_user].items():
+                        start_time2 = activity_data2['start_time']
+                        end_time2 = activity_data2['end_time']
+                        overlap_start = pd.to_datetime(max(start_time1, start_time2))
+                        overlap_end = pd.to_datetime(min(end_time1, end_time2))
+                        if (start_time1 <= end_time2) and (start_time2 <= end_time1):
+                            overlapping_activity_pairs.append(
+                                (cur_user, activity_id1, next_user, activity_id2, overlap_start, overlap_end))
+        # Find users who have been close in both space and time.
+        close_users = set()
+        total_pairs = len(overlapping_activity_pairs)
+        for index, (cur_user, activity_id1, next_user, activity_id2, overlap_start, overlap_end) in enumerate(
+                overlapping_activity_pairs):
+            print(f"Processing pair {index + 1} of {total_pairs}...")
+            # Early exit if the pair has already been found to be close.
+            if (cur_user, next_user) in close_users:
+                continue
+            activity1_trackpoints = [tp for tp in user_activities[cur_user][activity_id1]['trackpoints']
+                                     if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end]
+
+            activity2_trackpoints = [tp for tp in user_activities[next_user][activity_id2]['trackpoints']
+                                     if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end]
+
+            for trackpoint1 in activity1_trackpoints:
+                for trackpoint2 in activity2_trackpoints:
+                    time_diff = abs(pd.to_datetime(trackpoint1['date_time']) - pd.to_datetime(trackpoint2['date_time']))
+                    if time_diff.seconds <= 30:
+                        cord1 = (trackpoint1['lat'], trackpoint1['lon'])
+                        cord2 = (trackpoint2['lat'], trackpoint2['lon'])
+                        distance = haversine(cord1, cord2, unit="m")
+                        if distance <= 50:
+                            close_users.add(tuple(sorted([cur_user, next_user])))
+                            break
+        print(close_users)
 
 
+
+    except (FileNotFoundError, ValueError, json.JSONDecodeError):
+        # If there's any issue with the file or its contents, compute the data from scratch
+        df = pd.read_csv("stupid_solution.csv")
+        df['date_time'] = pd.to_datetime(df['date_time'])
+        df['activity_start_time'] = pd.to_datetime(df['activity_start_time'])
+        df['activity_end_time'] = pd.to_datetime(df['activity_end_time'])
+        user_activities = {}
+        for _, row in df.iterrows():
+            user_id = row['user']
+            activity_id = row['activity_id']
+            start_time = row['activity_start_time']
+            end_time = row['activity_end_time']
+            if user_id not in user_activities:
+                user_activities[user_id] = {}
+
+            if activity_id not in user_activities[user_id]:
+                user_activities[user_id][activity_id] = {
+                    'start_time': start_time,
+                    'end_time': end_time,
+                    'trackpoints': []
+                }
+            user_activities[user_id][activity_id]['trackpoints'].append({
+                'lat': row['lat'],
+                'lon': row['lon'],
+                'date_time': row['date_time']
+            })
+
+        # Save the dict to a json file.
+        with open('user_activities.json', 'w') as file:
+            json.dump(user_activities, file)
+
+    # processed = 0
+    # total = len(df)
+    # close_users = set()
+    # for _, row in df.iterrows():
+    #     user_pair = tuple(sorted([row["user1_id"], row["user2_id"]]))
+    #     if user_pair in close_users:
+    #         processed += 1
+    #         continue
+    #     coords1 = (row["trackpoint1_lat"], row["trackpoint1_lon"])
+    #     coords2 = (row["trackpoint2_lat"], row["trackpoint2_lon"])
+    #     distance = haversine(coords1, coords2, unit="m")
+    #     if distance <= 50:
+    #         close_users.add(user_pair)
+    #         processed += 1
+    #     print(f"Processed {processed}/{total} rows", end="\r")
+    # print(close_users)
 
 
 if __name__ == '__main__':
     program = None
     try:
-        program = task2()
-        #query2(program)
-        #query5(program)
+        # program = task2()
+        # query2(program)
+        # query5(program)
         query8(program)
-        #query11(program)
+        # query11(program)
         # Load data
 
     except Exception as e:
