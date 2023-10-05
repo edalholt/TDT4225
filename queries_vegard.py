@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 
 import pandas as pd
 from haversine import haversine
@@ -164,11 +165,12 @@ def query8(program):
                     for activity_id2, activity_data2 in user_activities[next_user].items():
                         start_time2 = activity_data2['start_time']
                         end_time2 = activity_data2['end_time']
-                        overlap_start = pd.to_datetime(max(start_time1, start_time2))
-                        overlap_end = pd.to_datetime(min(end_time1, end_time2))
                         if (start_time1 <= end_time2) and (start_time2 <= end_time1):
+                            overlap_start = pd.to_datetime(max(start_time1, start_time2))
+                            overlap_end = pd.to_datetime(min(end_time1, end_time2))
                             overlapping_activity_pairs.append(
                                 (cur_user, activity_id1, next_user, activity_id2, overlap_start, overlap_end))
+
         # Find users who have been close in both space and time.
         close_users = set()
         total_pairs = len(overlapping_activity_pairs)
@@ -178,12 +180,13 @@ def query8(program):
             # Early exit if the pair has already been found to be close.
             if (cur_user, next_user) in close_users:
                 continue
+            # Get trackpoints for the overlapping period.
             activity1_trackpoints = [tp for tp in user_activities[cur_user][activity_id1]['trackpoints']
                                      if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end]
 
             activity2_trackpoints = [tp for tp in user_activities[next_user][activity_id2]['trackpoints']
                                      if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end]
-
+            # Inefficient comparison of trackpoints.
             for trackpoint1 in activity1_trackpoints:
                 for trackpoint2 in activity2_trackpoints:
                     time_diff = abs(pd.to_datetime(trackpoint1['date_time']) - pd.to_datetime(trackpoint2['date_time']))
@@ -193,8 +196,18 @@ def query8(program):
                         distance = haversine(cord1, cord2, unit="m")
                         if distance <= 50:
                             close_users.add(tuple(sorted([cur_user, next_user])))
+                            print(f"Closer users found! Match between {cur_user} and {next_user}")
                             break
-        print(close_users)
+        close_users_dict = defaultdict(set)
+        for user1, user2 in close_users:
+            close_users_dict[user1].add(user2)
+            close_users_dict[user2].add(user1)
+
+        print("\nSummary of users and who they've been close to:")
+        for user, close_to in close_users_dict.items():
+            print(f"User {user} has been close to users: {', '.join(close_to)}")
+
+
 
 
 
