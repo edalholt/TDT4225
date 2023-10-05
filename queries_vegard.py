@@ -143,8 +143,8 @@ def query8(program):
     INNER JOIN TrackPoint ON Activity.id = TrackPoint.activity_id
     """
 
-    # df = pd.read_sql_query(query, program.db_connection)
-    # df.to_csv("stupid_solution.csv", index=False)
+    #df = pd.read_sql_query(query, program.db_connection)
+    #df.to_csv("all_data.csv", index=False)
 
     try:
         with open('user_activities.json', 'r') as file:
@@ -178,29 +178,41 @@ def query8(program):
                 overlapping_activity_pairs):
             print(f"Processing pair {index + 1} of {total_pairs}...")
             # Early exit if the pair has already been found to be close.
-            if (cur_user, next_user) in close_users:
+            if tuple(sorted([cur_user, next_user])) in close_users:
                 continue
             # Get trackpoints for the overlapping period.
-            activity1_trackpoints = [tp for tp in user_activities[cur_user][activity_id1]['trackpoints']
-                                     if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end]
+            activity1_trackpoints = sorted([tp for tp in user_activities[cur_user][activity_id1]['trackpoints']
+                                            if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end],
+                                           key=lambda tp: tp['date_time'])
 
-            activity2_trackpoints = [tp for tp in user_activities[next_user][activity_id2]['trackpoints']
-                                     if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end]
+            activity2_trackpoints = sorted([tp for tp in user_activities[next_user][activity_id2]['trackpoints']
+                                            if overlap_start <= pd.to_datetime(tp['date_time']) <= overlap_end],
+                                           key=lambda tp: tp['date_time'])
+
             found_close = False
+            j = 0
             for trackpoint1 in activity1_trackpoints:
                 if found_close:
                     break
-                for trackpoint2 in activity2_trackpoints:
-                    time_diff = abs(pd.to_datetime(trackpoint1['date_time']) - pd.to_datetime(trackpoint2['date_time']))
-                    if time_diff.seconds <= 30:
-                        cord1 = (trackpoint1['lat'], trackpoint1['lon'])
-                        cord2 = (trackpoint2['lat'], trackpoint2['lon'])
-                        distance = haversine(cord1, cord2, unit="m")
-                        if distance <= 50:
-                            close_users.add(tuple(sorted([cur_user, next_user])))
-                            print(f"Closer users found! Match between {cur_user} and {next_user}")
-                            found_close = True
-                            break
+                while j < len(activity2_trackpoints):
+                    time_diff = abs(pd.to_datetime(trackpoint1['date_time']) - pd.to_datetime(
+                        activity2_trackpoints[j]['date_time']))
+
+                    if time_diff.seconds > 30:
+                        j += 1
+                        continue
+
+                    cord1 = (trackpoint1['lat'], trackpoint1['lon'])
+                    cord2 = (activity2_trackpoints[j]['lat'], activity2_trackpoints[j]['lon'])
+                    distance = haversine(cord1, cord2, unit="m")
+
+                    if distance <= 50:
+                        close_users.add(tuple(sorted([cur_user, next_user])))
+                        print(
+                            f"Closer users found! Match between {cur_user} (activity {activity_id1}) and {next_user} (activity {activity_id2})")
+                        found_close = True
+                        break
+                    j += 1
 
         close_users_dict = defaultdict(set)
         for user1, user2 in close_users:
@@ -217,7 +229,7 @@ def query8(program):
 
     except (FileNotFoundError, ValueError, json.JSONDecodeError):
         # If there's any issue with the file or its contents, compute the data from scratch
-        df = pd.read_csv("stupid_slution.csv")
+        df = pd.read_csv("all_data.csv")
         user_activities = {}
         for _, row in df.iterrows():
             user_id = row['user']
@@ -261,15 +273,45 @@ def query8(program):
     # print(close_users)
 
 
+import re
+
+
+def print_matches_task8():
+    with open('matches.txt', 'r') as f:
+        content = f.readlines()
+
+    pattern = r"Closer users found! Match between (\d+) \(activity \d+\) and (\d+) \(activity \d+\)"
+    matches = []
+
+    for line in content:
+        match = re.search(pattern, line)
+        if match:
+            user1, user2 = map(int, match.groups())
+            matches.append((user1, user2))
+
+    # Organize the matches in a dictionary.
+    close_users_dict = defaultdict(set)
+    for user1, user2 in matches:
+        close_users_dict[user1].add(user2)
+        close_users_dict[user2].add(user1)
+
+    # Sort and print the results.
+    sorted_users = sorted(close_users_dict.keys())
+    for user in sorted_users:
+        close_to_users = sorted(list(close_users_dict[user]))
+        print(f"User {user}: {', '.join(map(str, close_to_users))}")
+
+
 if __name__ == '__main__':
     program = None
     try:
-        # program = task2()
+        #program = task2()
         # query2(program)
         # query5(program)
-        query8(program)
+        #query8(program)
         # query11(program)
         # Load data
+        query8(program)
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
