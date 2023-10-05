@@ -73,16 +73,16 @@ def query5(program):
 def query11(program):
     query11 = """
         WITH UserTrackPoints AS (
-            SELECT user_id, TrackPoint.id as track_point_id, date_time
+            SELECT user_id, TrackPoint.id as track_point_id, date_time, activity_id
             FROM Activity
             INNER JOIN TrackPoint ON Activity.id = TrackPoint.activity_id
             )
-            SELECT a.user_id,  COUNT(DISTINCT (a.track_point_id)) AS invalid_trackpoints
+            SELECT a.user_id,  COUNT(DISTINCT (a.activity_id)) AS invalid_activities
             FROM UserTrackPoints a
             JOIN UserTrackPoints b ON a.track_point_id = b.track_point_id + 1 AND a.user_id = b.user_id
             WHERE ABS(TIMESTAMPDIFF(MINUTE , a.date_time, b.date_time)) >= 5  
             GROUP BY a.user_id
-            ORDER BY invalid_trackpoints DESC
+            ORDER BY invalid_activities DESC
     """
     program.execute_sql_query(query11)
 
@@ -254,23 +254,6 @@ def query8(program):
         # Save the dict to a json file.
         with open('user_activities.json', 'w') as file:
             json.dump(user_activities, file)
-
-    # processed = 0
-    # total = len(df)
-    # close_users = set()
-    # for _, row in df.iterrows():
-    #     user_pair = tuple(sorted([row["user1_id"], row["user2_id"]]))
-    #     if user_pair in close_users:
-    #         processed += 1
-    #         continue
-    #     coords1 = (row["trackpoint1_lat"], row["trackpoint1_lon"])
-    #     coords2 = (row["trackpoint2_lat"], row["trackpoint2_lon"])
-    #     distance = haversine(coords1, coords2, unit="m")
-    #     if distance <= 50:
-    #         close_users.add(user_pair)
-    #         processed += 1
-    #     print(f"Processed {processed}/{total} rows", end="\r")
-    # print(close_users)
 
 
 import re
