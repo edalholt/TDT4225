@@ -67,9 +67,9 @@ class ExampleProgram:
             "ALTER TABLE TrackPoint ADD FOREIGN KEY (activity_id) REFERENCES Activity(id) ON DELETE CASCADE")
         
         self.cursor.execute(
-            "ALTER TABLE TrackPoint ADD COLUMN lat FLOAT")
+            "ALTER TABLE TrackPoint ADD COLUMN lat DECIMAL(15,13)")
         self.cursor.execute(
-            "ALTER TABLE TrackPoint ADD COLUMN lon FLOAT")
+            "ALTER TABLE TrackPoint ADD COLUMN lon DECIMAL(16,13)")
         self.cursor.execute(
             "ALTER TABLE TrackPoint ADD COLUMN altitude INT")
         self.cursor.execute(
