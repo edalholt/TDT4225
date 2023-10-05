@@ -152,8 +152,9 @@ def query8(program):
         INNER JOIN TrackPoint ON Activity.id = TrackPoint.activity_id
         """
 
+    print("Fetching data from database...")
     df = pd.read_sql_query(query, program.db_connection)
-
+    print("Data fetched from database. \nCreating dict for lookups...")
     # Create dict for lookups.
     user_activities = {}
     for _, row in df.iterrows():
