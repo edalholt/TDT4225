@@ -30,6 +30,7 @@ First ten rows from TrackPoint:
 Question 1: 
 <img width="371" alt="query1" src="https://github.com/edalholt/TDT4225/assets/41023500/9cde9df2-02e9-4d92-9475-c9f9d510ac58">
 
+Used COUNT(*) for counting rows in each table.
 
 Question 2: 
 In this query we created a CTE out of the activity data joined with TrackPoints.
@@ -48,6 +49,7 @@ The results show the top 15 users with the most registered activities and how ma
 Question 4: 
 <img width="356" alt="query4" src="https://github.com/edalholt/TDT4225/assets/41023500/53409900-653a-4c4d-bae4-7778971544b0">
 
+Selected all distinct (unique) user IDs from activities with a "bus" label attached.
 
 Question 5: 
 Counted the number of unique transportation modes each user had where we filtered out null values (users that didn't have labels associated with them had null by default).
@@ -63,9 +65,11 @@ Grouped user_id, start_date_time and end_date_time. Counted how many elements ar
 Question 7: 
 <img width="927" alt="query7" src="https://github.com/edalholt/TDT4225/assets/41023500/e34898c6-8275-4a7d-9546-c9cbb0b049fe">
 
+First counted the distinct user IDs from activities where there was an activity that did not end on the same date that it started on.
+For task B we listed the transportation mode, user ID, and duration for these activities. We used TIMEDIFF from MySQL for calculating the timespan between two date objects.
 
 Question 8: 
-This proved to be the most tricky query of them all. Initially, we had a query that first found overlapping activities between a user pair using the start and end times.
+This proved to be the most tricky query of them all. Initially, we had a query that found overlapping activities between a user pair using the start and end times.
 We then used this overlap to fetch only the track points that were within this overlap and within a 30-second window.
 Due to numerous joins, this query literally did not finish executing. We then decided to try a different approach where we simply fetched all data initially.
 We then manipulated the data using pandas and Python to do what our initial query did. First, find overlapping activities, then find track points within the time frame of these overlapping activities and within a 30-second window.
