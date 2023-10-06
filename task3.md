@@ -127,7 +127,3 @@ Some of the things the group learned:
 - How to use Pandas. Pandas proved to be convenient when iterating over the results of a query. Some times large SQL queries performed badly on the limited resources of the database VM, and in this case pandas/python scripting was especially useful.
 - The division of questions resulted in all members getting to learn how to write queries and code for very large data volumes.
 - The hardware the database is run on matters for performance. For task 8, our first query would probably execute if the database was running on one of our own computers using a Docker   solution.
-
-
-## Feedback
-Optional - give us feedback on the task if you have any. The assignment is new this semester and we would love to improve if there were any problems.
