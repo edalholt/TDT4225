@@ -87,7 +87,7 @@ def query2(program):
 def query3(program):
     print("--- Query 3 ---\n")
 
-    program.execute_sql_query("""SELECT user_id, COUNT(user_id) AS 'Number of activities' 
+    program.execute_sql_query("""SELECT user_id, COUNT(user_id) AS 'number_of_activities' 
     FROM Activity 
     GROUP BY user_id 
     ORDER BY COUNT(user_id) DESC 
@@ -268,7 +268,7 @@ def query8(program):
 
 def query9(program):
     rows = program.execute_sql_no_print("""SELECT altitude, Activity.id AS activity_id, 
-    TrackPoint.id AS tp_id, Activity.user_id AS user_id 
+    Activity.user_id AS user_id 
     FROM Activity 
     INNER JOIN TrackPoint ON Activity.id=TrackPoint.activity_id""")
     users_dict = {}
@@ -286,16 +286,16 @@ def query9(program):
         # If current trackpoint has a higher altitude value than the last trackpoint, 
         # and they belong to the same activity, add to user's total
         if (current_alt != -777 and prev_alt != -777 and current_alt > prev_alt and current_activity == prev_activity):
-            users_dict[user_id] = users_dict[user_id] + (current_alt - prev_alt)
+            users_dict[user_id] = users_dict[user_id] + (current_alt - prev_alt)/ 3.281
 
     # Find top 15 users who have gained the most altitude meters
     top_15 = []
     for i in range(15):
-        most_alt_gained = (max(users_dict, key=users_dict.get), (max(users_dict.values()) / 3.281))
+        most_alt_gained = (max(users_dict, key=users_dict.get), max(users_dict.values()))
         top_15.append(most_alt_gained)
         del users_dict[max(users_dict, key=users_dict.get)]
 
-    print(tabulate(top_15, headers=["user_id", "total altitude meters gained"]))
+    print(tabulate(top_15, headers=["user_id", "total_altitude_meters_gained"]))
 
 
 def query10(program):
@@ -369,15 +369,15 @@ def query12(program):
 
     program.execute_sql_query("""WITH MostFrequent AS (
             SELECT
-                User.id,
-                transportation_mode,
+                User.id AS user_id,
+                transportation_mode AS most_used_transportation_mode,
                 RANK() OVER (PARTITION BY User.id ORDER BY COUNT(*) DESC) AS most_frequent
             FROM User
             INNER JOIN Activity ON User.id = Activity.user_id
             WHERE transportation_mode IS NOT NULL
             GROUP BY User.id, transportation_mode
         )
-        SELECT id, transportation_mode
+        SELECT user_id, most_used_transportation_mode
         FROM MostFrequent
         WHERE most_frequent = 1
     """)
@@ -387,7 +387,7 @@ def main():
     program = None
     try:
         program = task2()
-        query8(program)
+        query9(program)
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
