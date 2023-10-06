@@ -39,7 +39,7 @@ We then selected trackpoints from this table and used the AVG, MIN, and MAX func
 
 
 
-#### Question 3: \
+#### Question 3:
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/57031213-8281-4c20-ad91-8ac1d17c3363)
 
 Counted how many times each user_id appears in the Activity table. The user_id that appears the most must belong to the user with the most activities. Retrieved the 15 users with the most activities.
@@ -57,7 +57,7 @@ Then ordered by unique modes in descending order and limited the result to 10.
 ![image](https://github.com/edalholt/TDT4225/assets/69513661/330fca0d-51d6-40f6-918e-23b823cef76c)
 
 
-#### Question 6: \
+#### Question 6:
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/47481399-661b-4e91-be8b-2a7ee576fc15)
 
 Grouped user_id, start_date_time and end_date_time. Counted how many elements are in each group. If a group has more than one element, it means that a user has registered the same activity multiple times. The query gave zero results, meaning that no activities were registered multiple times. 
@@ -84,7 +84,7 @@ However, we did encounter some interesting things during this task.
 Several users shared duplicate PLT files which had the same file name indicating they were started at the exact same time. This caused said users to be deemed 'close'. It's not unthinkable that people have started the activity at the exact same time, but some of them also contained the same exact amount of track points with matching values. We considered files with matching start times and identical track points as dataset anomalies and subsequently filtered them out.
 
 
-#### Question 9: \
+#### Question 9: 
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/e7915917-c6a0-402d-acae-632332b4b448)
 
 Retrieved all altitudes, activity, IDs, and user IDs from Activity and TrackPoint. In a dictionary, every user’s gain of altitude meters. Iterated over every row from the result of the query. If a TrackPoint’s altitude was higher than the previous TrackPoint’s, and they belonged to the same activity, it meant that the user had gained altitude and added this to the user’s sum of gained altitude meters. When this was done for all TrackPoints, found the 15 users who had gained the most altitude meters.
@@ -105,7 +105,7 @@ Then we just counted this and grouped it by user_id and invalid activities in de
 ![image](https://github.com/edalholt/TDT4225/assets/69513661/c52725df-687e-4121-9c4d-301b1386dc4e)
 
 
-#### Question 12: \
+#### Question 12: 
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/ece024dd-ad66-42bb-bc21-709574a06581)
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/4242397f-948f-4a3d-bcfb-f95b96515f28)
 
