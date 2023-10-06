@@ -81,7 +81,7 @@ However, we did encounter some interesting things during this task.
 
 ![image](https://github.com/edalholt/TDT4225/assets/69513661/a6317911-c402-49e4-b2c5-d2a79693b3a7)
 
-Several users shared duplicate PLT files which contained exactly the same track points. This caused said users to be deemed 'close'. We deemed this to be a bug within the original dataset and filtered these files out.
+Several users shared duplicate PLT files which contained exactly the same track points. This caused said users to be deemed 'close'. It's not unthinkable that people have started the activity at the exact same time, but the also contained the exact amount of trackpoints Therefore we deemed this to be a bug within the original dataset and filtered these files out.
 
 
 Question 9: \
@@ -94,8 +94,7 @@ The results show the 15 users who have gained the most altitude meters and how m
 Question 10: 
 
 In this query, we used SQL to get all track points from users that have traveled the longest total distance in one day and have a label attached to the activity. Then we used pandas together with the haversine formula to sum up the total distances.
-
-In this query 
+![image](https://github.com/edalholt/TDT4225/assets/69513661/b98fb50a-fe6d-48d5-a4a7-dcd2e5c34717)
 
 Question 11: 
 For this query we again created a CTE out of the activity data joined with TrackPoints.
