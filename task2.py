@@ -387,7 +387,6 @@ def main():
     program = None
     try:
         program = task2()
-        query9(program)
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
