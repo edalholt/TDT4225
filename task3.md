@@ -31,7 +31,10 @@ Question 1:
 
 Question 2: 
 In this query we created a CTE out of the activity data joined with TrackPoints.
-We then selected trackpoints from this table and used the AVG, MIN and MAX functions to answer the query.
+We then selected trackpoints from this table and used the AVG, MIN and MAX functions provided by the SQL-language to answer the query.
+![image](https://github.com/edalholt/TDT4225/assets/69513661/fd54df29-5208-47b5-86b8-4188883e5cde)
+
+
 
 Question 3: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/57031213-8281-4c20-ad91-8ac1d17c3363)
@@ -43,8 +46,10 @@ The results show the top 15 users with the most registered activities and how ma
 Question 4: 
 
 Question 5: 
-Simply counted the number of unique transportation modes each user had (filtered out NULL.)
+Simply counted the number of unique transportation modes each user had where we filtered out null values (users that didnt have labels associated with them had null by default).
 Then ordered by unique modes in descending order and limited the result to 10.
+![image](https://github.com/edalholt/TDT4225/assets/69513661/330fca0d-51d6-40f6-918e-23b823cef76c)
+
 
 Question 6: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/47481399-661b-4e91-be8b-2a7ee576fc15)
@@ -54,11 +59,20 @@ Grouped user_id, start_date_time and end_date_time. Counted how many elements ar
 Question 7: 
 
 Question 8: 
-This proved to be the most tricky query of them all simply. Initially we had a query that first found overlapping activities.
-Then we found the overlap between two users and used this to find the corresponding trackponts. Then we set a condition to join where the trackpoints were within a 30 second interval.
-However, due to the number of joins performed, we never saw this query finish due to the sheer amount of data.
+This proved to be the most tricky query of them all. Initially we had a query that first found overlapping activities between a user pair using the start and end times.
+We then used this overlap to fetch only the trackpoints that were within this overlap and within a 30 second window.
+Due to numerous joins, this query literally did not finish executing. We then decided to try a different approach where we simply fetched all data initially.
+We then manipulated the data using pandas and python to do what our initial query did. First find overlapping activities, then find track-points within these overlapping activities time frame and within a 30 second window.
+This reduced the amount of computations significantly. We finally used the haversine function to calculate the distance between to users.
 
-Instead, we returned all the data from the database, created dictionaries from it, and then used pandas and python to parse and find users who had been close in time and space.
+![image](https://github.com/edalholt/TDT4225/assets/69513661/f0dac7b1-2c1b-44d3-91fb-3abf4a18c3b4)
+
+We did however, encounter some intresting things during this task.
+
+![image](https://github.com/edalholt/TDT4225/assets/69513661/a6317911-c402-49e4-b2c5-d2a79693b3a7)
+
+Several users shared duplicate PLT files which contained exactly the same trackpoints. This caused said users to be deemed 'close'. We deemed this to be a bug within the original dataset, and filtered these files out.
+
 
 Question 9: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/e7915917-c6a0-402d-acae-632332b4b448)
@@ -74,6 +88,9 @@ For this query we again created a CTE out of the activity data joined with Track
 We then performed a self join on this newly created table where the user_id was the same, but the trackpoint id was incremented by one.
 We then checked if the time between the two trackpoints was more than 5 minutes, in which case we deemed it invalid.
 Then we just counted this and grouped by user_id and invalid activities in a descending order.
+
+![image](https://github.com/edalholt/TDT4225/assets/69513661/c52725df-687e-4121-9c4d-301b1386dc4e)
+
 
 Question 12: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/ece024dd-ad66-42bb-bc21-709574a06581)
@@ -96,6 +113,7 @@ Some of the things the group learned:
 - Batching is convenient when inserting lots of data. Batching greatly improved our data insert times.
 - How to use Pandas. Pandas proved to be convenient when iterating over the results of a query.
 - The division of questions resulted in all members getting to learn how to write queries and code for very large data volumes.
+- The hardware the database is ran on matters for performance. For task 8, our first query would probably execute if the database was ran on one of our own computers using a Docker   solution.
 
 
 ## Feedback
