@@ -27,48 +27,48 @@ First ten rows from TrackPoint:
 
 (Add pictures and results, describe briefly)
 
-Question 1:  
+#### Question 1:  
 <img width="371" alt="query1" src="https://github.com/edalholt/TDT4225/assets/41023500/9cde9df2-02e9-4d92-9475-c9f9d510ac58">
 
 Used COUNT(*) for counting rows in each table.
 
-Question 2: 
+#### Question 2: 
 In this query, we created a CTE out of the activity data joined with TrackPoints.
 We then selected trackpoints from this table and used the AVG, MIN, and MAX functions provided by the SQL language to answer the query.
 ![image](https://github.com/edalholt/TDT4225/assets/69513661/fd54df29-5208-47b5-86b8-4188883e5cde)
 
 
 
-Question 3: \
+#### Question 3: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/57031213-8281-4c20-ad91-8ac1d17c3363)
 
 Counted how many times each user_id appears in the Activity table. The user_id that appears the most must belong to the user with the most activities. Retrieved the 15 users with the most activities.
 
 The results show the top 15 users with the most registered activities and how many activities they have registered.
 
-Question 4: 
+#### Question 4: 
 <img width="356" alt="query4" src="https://github.com/edalholt/TDT4225/assets/41023500/53409900-653a-4c4d-bae4-7778971544b0">
 
 Selected all distinct (unique) user IDs from activities with a "bus" label attached.
 
-Question 5: 
+#### Question 5: 
 Counted the number of unique transportation modes each user had where we filtered out null values (users that didn't have labels associated with them had null by default).
 Then ordered by unique modes in descending order and limited the result to 10.
 ![image](https://github.com/edalholt/TDT4225/assets/69513661/330fca0d-51d6-40f6-918e-23b823cef76c)
 
 
-Question 6: \
+#### Question 6: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/47481399-661b-4e91-be8b-2a7ee576fc15)
 
 Grouped user_id, start_date_time and end_date_time. Counted how many elements are in each group. If a group has more than one element, it means that a user has registered the same activity multiple times. The query gave zero results, meaning that no activities were registered multiple times. 
 
-Question 7: 
+#### Question 7: 
 <img width="927" alt="query7" src="https://github.com/edalholt/TDT4225/assets/41023500/e34898c6-8275-4a7d-9546-c9cbb0b049fe">
 
 First counted the distinct user IDs from activities where there was an activity that did not end on the same date that it started on.
 For task B we listed the transportation mode, user ID, and duration for these activities. We used TIMEDIFF from MySQL to calculate the timespan between two date objects.
 
-Question 8: 
+#### Question 8: 
 This proved to be the most tricky query of them all. Initially, we had a query that found overlapping activities between a user pair using the start and end times.
 We then used this overlap to fetch only the track points that were within this overlap and within a 30-second window.
 Due to numerous joins, this query literally did not finish executing. We then decided to try a different approach where we simply fetched all data initially.
@@ -81,22 +81,22 @@ However, we did encounter some interesting things during this task.
 
 ![image](https://github.com/edalholt/TDT4225/assets/69513661/a6317911-c402-49e4-b2c5-d2a79693b3a7)
 
-Several users shared duplicate PLT files which contained exactly the same track points. This caused said users to be deemed 'close'. It's not unthinkable that people have started the activity at the exact same time, but the also contained the exact amount of trackpoints Therefore we deemed this to be a bug within the original dataset and filtered these files out.
+Several users shared duplicate PLT files which had the same file name indicating they were started at the exact same time. This caused said users to be deemed 'close'. It's not unthinkable that people have started the activity at the exact same time, but some of them also contained the same exact amount of track points with matching values. We considered files with matching start times and identical track points as dataset anomalies and subsequently filtered them out.
 
 
-Question 9: \
+#### Question 9: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/e7915917-c6a0-402d-acae-632332b4b448)
 
 Retrieved all altitudes, activity, IDs, and user IDs from Activity and TrackPoint. In a dictionary, every user’s gain of altitude meters. Iterated over every row from the result of the query. If a TrackPoint’s altitude was higher than the previous TrackPoint’s, and they belonged to the same activity, it meant that the user had gained altitude and added this to the user’s sum of gained altitude meters. When this was done for all TrackPoints, found the 15 users who had gained the most altitude meters.
 
 The results show the 15 users who have gained the most altitude meters and how many altitude meters they have gained.
 
-Question 10: 
+#### Question 10: 
 
 In this query, we used SQL to get all track points from users that have traveled the longest total distance in one day and have a label attached to the activity. Then we used pandas together with the haversine formula to sum up the total distances.
 ![image](https://github.com/edalholt/TDT4225/assets/69513661/b98fb50a-fe6d-48d5-a4a7-dcd2e5c34717)
 
-Question 11: 
+#### Question 11: 
 For this query we again created a CTE out of the activity data joined with TrackPoints.
 We then performed a self-join on this newly created table where the user_id was the same, but the TrackPoint id was incremented by one.
 We then checked if the time between the two track points was more than 5 minutes, in which case we deemed it invalid.
@@ -105,7 +105,7 @@ Then we just counted this and grouped it by user_id and invalid activities in de
 ![image](https://github.com/edalholt/TDT4225/assets/69513661/c52725df-687e-4121-9c4d-301b1386dc4e)
 
 
-Question 12: \
+#### Question 12: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/ece024dd-ad66-42bb-bc21-709574a06581)
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/4242397f-948f-4a3d-bcfb-f95b96515f28)
 
