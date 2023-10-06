@@ -27,14 +27,14 @@ First ten rows from TrackPoint:
 
 (Add pictures and results, describe briefly)
 
-Question 1: 
+Question 1:  
 <img width="371" alt="query1" src="https://github.com/edalholt/TDT4225/assets/41023500/9cde9df2-02e9-4d92-9475-c9f9d510ac58">
 
 Used COUNT(*) for counting rows in each table.
 
 Question 2: 
-In this query we created a CTE out of the activity data joined with TrackPoints.
-We then selected trackpoints from this table and used the AVG, MIN and MAX functions provided by the SQL-language to answer the query.
+In this query, we created a CTE out of the activity data joined with TrackPoints.
+We then selected trackpoints from this table and used the AVG, MIN, and MAX functions provided by the SQL language to answer the query.
 ![image](https://github.com/edalholt/TDT4225/assets/69513661/fd54df29-5208-47b5-86b8-4188883e5cde)
 
 
@@ -66,7 +66,7 @@ Question 7:
 <img width="927" alt="query7" src="https://github.com/edalholt/TDT4225/assets/41023500/e34898c6-8275-4a7d-9546-c9cbb0b049fe">
 
 First counted the distinct user IDs from activities where there was an activity that did not end on the same date that it started on.
-For task B we listed the transportation mode, user ID, and duration for these activities. We used TIMEDIFF from MySQL for calculating the timespan between two date objects.
+For task B we listed the transportation mode, user ID, and duration for these activities. We used TIMEDIFF from MySQL to calculate the timespan between two date objects.
 
 Question 8: 
 This proved to be the most tricky query of them all. Initially, we had a query that found overlapping activities between a user pair using the start and end times.
