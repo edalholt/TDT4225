@@ -60,7 +60,7 @@ Then ordered by unique modes in descending order and limited the result to 10.
 Question 6: \
 ![image](https://github.com/edalholt/TDT4225/assets/69513928/47481399-661b-4e91-be8b-2a7ee576fc15)
 
-Grouped user_id, start_date_time and end_date_time. Counted how many elements are in each group. If a group has more than one element, it means that the same activity has been registered multiple times. The query gave zero results, meaning that no activities were registered multiple times. 
+Grouped user_id, start_date_time and end_date_time. Counted how many elements are in each group. If a group has more than one element, it means that a user has registered the same activity multiple times. The query gave zero results, meaning that no activities were registered multiple times. 
 
 Question 7: 
 <img width="927" alt="query7" src="https://github.com/edalholt/TDT4225/assets/41023500/e34898c6-8275-4a7d-9546-c9cbb0b049fe">
