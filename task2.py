@@ -188,10 +188,9 @@ def query8(program):
             end_time1 = activity_data1['end_time']
             for next_user in users[index + 1:]:
                 for activity_id2, activity_data2 in user_activities[next_user].items():
-                    # means that the activities in question is most likely from a bug.
                     filtered_activity1 = activity_id1[:-3]
                     filtered_activity2 = activity_id2[:-3]
-                    # Same ID
+                    # Same ID, most likely a bug, we skip it.
                     if filtered_activity1 == filtered_activity2:
                         if len(activity_data1['trackpoints']) == len(activity_data2['trackpoints']):
                             continue
@@ -209,7 +208,6 @@ def query8(program):
     total_pairs = len(overlapping_activity_pairs)
     for index, (cur_user, activity_id1, next_user, activity_id2, overlap_start, overlap_end) in enumerate(
             overlapping_activity_pairs):
-        print(f"Processing pair {index + 1} of {total_pairs}...")
         # Early exit if the pair has already been found to be close.
         if tuple(sorted([cur_user, next_user])) in close_users:
             continue
@@ -225,6 +223,7 @@ def query8(program):
         found_close = False
         j = 0
         for trackpoint1 in activity1_trackpoints:
+            # If we have found a close match, we can skip the rest of the trackpoints.
             if found_close:
                 break
             while j < len(activity2_trackpoints):
@@ -240,6 +239,7 @@ def query8(program):
                 distance = haversine(cord1, cord2, unit="m")
 
                 if distance <= 50:
+                    # Distance 0 = suspicious, but not necessarily a duplicate.
                     if distance == 0:
                         potential_duplicates.append(
                             [cur_user, activity_id1, trackpoint1['date_time'].strftime('%Y-%m-%d %H:%M:%S'), cord1,
@@ -249,24 +249,17 @@ def query8(program):
                     print(
                         f"Closer users found! Match between {cur_user} (activity {activity_id1}) and {next_user} (activity {activity_id2}.)")
                     print(
-                        f"User {cur_user} has t"
-                        f"rackpoint {trackpoint1['date_time']} at {cord1}. User {next_user} has trackpoint {activity2_trackpoints[j]['date_time']} at {cord2}. Distance: {distance:.2f} meters.")
+                        f"User {cur_user} has trackpoint {trackpoint1['date_time']} at {cord1}."
+                        f" User {next_user} has trackpoint {activity2_trackpoints[j]['date_time']} at {cord2}. Distance: {distance:.2f} meters.")
                     found_close = True
                     break
                 j += 1
-    with open("potential_duplicatesV2.txt", "w") as f:
-        json.dump(potential_duplicates, f)
-
-    #print(potential_duplicates)
     # Print results.
     close_users_dict = defaultdict(set)
     for user1, user2 in close_users:
         close_users_dict[user1].add(user2)
         close_users_dict[user2].add(user1)
-
-    # Sort the users by their ID in ascending order
     sorted_users = sorted(close_users_dict.keys(), key=lambda x: int(x))
-
     for user in sorted_users:
         sorted_matches = sorted(close_users_dict[user],
                                 key=lambda x: int(x))
