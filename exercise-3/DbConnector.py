@@ -13,7 +13,7 @@ class DbConnector:
     """
 
     def __init__(self,
-                 DATABASE='DATABASE_NAME',
+                 DATABASE='activity_data',
                  HOST="tdt4225-36.idi.ntnu.no",
                  USER="admin",
                  PASSWORD="LetMeIn"):
