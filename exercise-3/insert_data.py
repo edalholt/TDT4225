@@ -3,6 +3,7 @@ from DbConnector import DbConnector
 import time
 import math
 import json
+from datetime import datetime
 
 user_tables = []
 user_activities = []
@@ -59,7 +60,16 @@ class ExampleProgram:
 
     def insert_activity_data(self):
         collection = self.db["Activities"]
-        data_to_insert = [({"_id": item["id"], "user_id": item["user_id"], "transportation_mode": item["transportation_mode"], "start_date_time": item["start_date_time"], "end_date_time": item["end_date_time"]}) for item in user_activities]
+        data_to_insert = [
+            {
+                "_id": item["id"],
+                "user_id": item["user_id"],
+                "transportation_mode": item["transportation_mode"],
+                "start_date_time": datetime.strptime(item["start_date_time"].strip(" \n"), "%Y-%m-%d %H:%M:%S"),
+                "end_date_time": datetime.strptime(item["end_date_time"].strip(" \n"), "%Y-%m-%d %H:%M:%S")
+            }
+            for item in user_activities
+        ]
         collection.insert_many(data_to_insert)
 
     def insert_track_point_data(self):
@@ -69,7 +79,7 @@ class ExampleProgram:
         number_of_chunks = len(track_points_chunks)
         for chunk in track_points_chunks:
             print(f"Inserting chunk {track_points_chunks.index(chunk) + 1} of {number_of_chunks}")
-            data_to_insert = [({"activity_id": item["activity_id"], "lat": item["lat"], "lon": item["lon"], "altitude": item["altitude"], "date_days": item["date_days"], "date_time": item["date_time"]}) for item in chunk]
+            data_to_insert = [({"activity_id": item["activity_id"], "lat": item["lat"], "lon": item["lon"], "altitude": item["altitude"], "date_days": item["date_days"], "date_time": datetime.strptime(item["date_time"], "%Y-%m-%d %H:%M:%S")}) for item in chunk]
             collection.insert_many(data_to_insert)
             print(f"Inserted chunk {track_points_chunks.index(chunk) + 1} of {number_of_chunks} successfully")
 
