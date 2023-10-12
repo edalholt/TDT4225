@@ -13,10 +13,10 @@
 
 .DS_Store
 **/.DS_Store
-**/venv
+*/venv
 **/__pycache__
 
-/dataset
+**/dataset
 output.json
 /data.csv
 

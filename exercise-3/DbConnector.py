@@ -17,7 +17,7 @@ class DbConnector:
                  HOST="tdt4225-36.idi.ntnu.no",
                  USER="admin",
                  PASSWORD="LetMeIn"):
-        uri = "mongodb://%s:%s@%s" % (USER, PASSWORD, HOST)
+        uri = "mongodb://%s:%s@%s/%s" % (USER, PASSWORD, HOST, DATABASE)
         # Connect to the databases
         try:
             self.client = MongoClient(uri)
