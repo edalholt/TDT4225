@@ -1,9 +1,5 @@
 from pprint import pprint 
 from DbConnector import DbConnector
-import time
-import math
-import json
-from haversine import haversine, Unit
 
 class queries:
 
