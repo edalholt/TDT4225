@@ -49,15 +49,14 @@ class queries:
             userActivities = list(activitiesCollection.find({"user_id": userID}, {"_id": 1}))
             userActivityIds = [activity["_id"] for activity in userActivities]
 
-            trackpoints = list(trackpointsCollection.find({"activity_id": {"$in": userActivityIds}}))
+            trackpoints = list(trackpointsCollection.find({"activity_id": {"$in": userActivityIds}, "altitude": {"$ne": -777}}))
 
             altitude_gain = 0
             last_altitude = 0
             for trackpoint in trackpoints:
-                if (trackpoint['altitude'] != -777):
-                    if trackpoint['altitude'] > last_altitude:
-                        altitude_gain += trackpoint['altitude'] - last_altitude
-                    last_altitude = trackpoint['altitude']
+                if trackpoint['altitude'] > last_altitude:
+                    altitude_gain += trackpoint['altitude'] - last_altitude
+                last_altitude = trackpoint['altitude']
             
             # Convert altitude gain from feet to meters.
             altitude_gain = round(altitude_gain * 0.3048, 2)
@@ -75,7 +74,7 @@ class queries:
         activitiesCollection = self.db['Activities']
         trackpointsCollection = self.db['TrackPoints']
         trackpointsCollection.create_index([("location", "2dsphere")])
-        distance = 1000
+        distance = 500
 
         trackpoints = trackpointsCollection.distinct("activity_id", {
             "location": {
@@ -95,7 +94,7 @@ class queries:
              {"$in": trackpoints}
             })
 
-        print(f"\n\nUsers that have tracked an activity within {distance}m of the forbidden city:")
+        print(f"\n\nUsers that have tracked an activity within a radius of {distance}m of the forbidden city:")
         pprint(user_ids)
 
 
