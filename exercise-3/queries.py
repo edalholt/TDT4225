@@ -74,23 +74,29 @@ class queries:
     def query10(self):
         activitiesCollection = self.db['Activities']
         trackpointsCollection = self.db['TrackPoints']
+        trackpointsCollection.create_index([("location", "2dsphere")])
+        distance = 1000
 
-        usersMatch = []
-        
-        # For each user with an activity, find all trackpoints for the user's activities.
-        for userID in activitiesCollection.distinct("user_id"):
-            print("Checking user: ", userID)
-            userActivities = list(activitiesCollection.find({"user_id": userID}, {"_id": 1}))
-            userActivityIds = [activity["_id"] for activity in userActivities]
+        trackpoints = trackpointsCollection.distinct("activity_id", {
+            "location": {
+                "$near": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [116.397, 39.916]
+                    },
+                    "$maxDistance": distance,
+                    "$minDistance": 0
+                }
+            }
+        })
 
-            trackpoints = list(trackpointsCollection.find({"activity_id": {"$in": userActivityIds}}))
+        user_ids = activitiesCollection.distinct("user_id", 
+            {"_id": 
+             {"$in": trackpoints}
+            })
 
-            for trackpoint in trackpoints:
-                if(haversine((trackpoint['lat'], trackpoint['lon']), (39.916, 116.397), unit=Unit.KILOMETERS) < 1):
-                    usersMatch.append(userID)
-                    break
-        print("\n\n Users that have tracked an activity within 1km of the forbidden city:")
-        pprint(usersMatch)
+        print(f"\n\nUsers that have tracked an activity within {distance}m of the forbidden city:")
+        pprint(user_ids)
 
 
     def queryExample(self):
@@ -107,6 +113,7 @@ def main():
     program = None
     try:
         program = queries()
+        program.query10()
 
 
     except Exception as e:

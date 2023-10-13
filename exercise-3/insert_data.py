@@ -79,7 +79,7 @@ class ExampleProgram:
         number_of_chunks = len(track_points_chunks)
         for chunk in track_points_chunks:
             print(f"Inserting chunk {track_points_chunks.index(chunk) + 1} of {number_of_chunks}")
-            data_to_insert = [({"activity_id": item["activity_id"], "lat": item["lat"], "lon": item["lon"], "altitude": item["altitude"], "date_days": item["date_days"], "date_time": datetime.strptime(item["date_time"], "%Y-%m-%d %H:%M:%S")}) for item in chunk]
+            data_to_insert = [({"activity_id": item["activity_id"], "location": { "type": "Point", "coordinates": [item["lon"], item["lat"]] }, "altitude": item["altitude"], "date_days": item["date_days"], "date_time": datetime.strptime(item["date_time"], "%Y-%m-%d %H:%M:%S")}) for item in chunk]
             collection.insert_many(data_to_insert)
             print(f"Inserted chunk {track_points_chunks.index(chunk) + 1} of {number_of_chunks} successfully")
 
