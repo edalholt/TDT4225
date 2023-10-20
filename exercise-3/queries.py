@@ -8,6 +8,13 @@ class queries:
         self.client = self.connection.client
         self.db = self.connection.db
    
+    def query0(self):
+        userCollection = self.db["Users"]
+        result = userCollection.find({}).limit(10)
+
+        for doc in result:
+            pprint(doc)
+
     def query1(self):
         userCollection = self.db["Users"]
         activitiesCollection = self.db["Activities"]
@@ -136,7 +143,7 @@ def main():
     program = None
     try:
         program = queries()
-        program.query4()
+        program.query0()
 
 
     except Exception as e:
