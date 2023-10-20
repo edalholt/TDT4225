@@ -11,12 +11,40 @@ class queries:
         self.client = self.connection.client
         self.db = self.connection.db
 
+    def query1(self):
+        userCollection = self.db["Users"]
+        activitiesCollection = self.db["Activities"]
+        trackpointsCollection = self.db["TrackPoints"]
+
+        print("Number of users:", userCollection.count_documents({}))
+        print("Number of activities:", activitiesCollection.count_documents({}))
+        print("Number of trackpoints:", trackpointsCollection.count_documents({}))
+
     def query2(self):
         userCollection = self.db["Users"]
         activitiesCollection = self.db['Activities']
 
         print(activitiesCollection.count_documents({}) / userCollection.count_documents({}))
 
+    def query4(self):
+        activitiesCollection = self.db["Activities"]
+
+        result = activitiesCollection.aggregate([
+            {
+                "$match": {
+                    "transportation_mode": "taxi"
+                }
+            }, {
+                "$group": {
+                   "_id": "$user_id"
+                }
+            }
+        ])
+
+        print("Users who have taken a taxi:")
+        for doc in result:
+            pprint(doc)
+            
     def query3(self):
         """
         Find the top 20 users with the highest number of activities.
@@ -241,7 +269,6 @@ def main():
     program = None
     try:
         program = queries()
-        program.query9()
 
 
     except Exception as e:
