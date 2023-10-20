@@ -1,3 +1,4 @@
+from collections import defaultdict
 from pprint import pprint
 
 from DbConnector import DbConnector
@@ -30,6 +31,7 @@ def query3(program):
     documents = collection.aggregate([
         {"$group": {"_id": "$user_id", "count": {"$sum": 1}}},
         {"$sort": {"count": -1}},
+        {"$limit": 20}
     ])
     for doc in documents:
         pprint(doc)
@@ -73,8 +75,51 @@ def query6(program):
 
 
 def query9(program):
-    collection = program.db['Activities']
-    query = collection.aggregate([
+    activitiesCollection = program.db['Activities']
+    trackpointsCollection = program.db['TrackPoints']
+
+    invalid_activities = defaultdict(int)
+    for user_id in activitiesCollection.distinct("user_id"):
+        # get all activities belonging to the user.
+        user_activities = list(activitiesCollection.find({"user_id": user_id}, {"_id": 1}))
+        user_activity_ids = [activity["_id"] for activity in user_activities]
+
+        # get all trackpoints for the user's activities.
+        user_trackpoints = trackpointsCollection.find({"activity_id": {"$in": user_activity_ids}},
+                                                      {"activity_id": 1, "date_time": 1})
+        # Create a dict for the activities and the trackpoints belonging to them.
+        activity_dict = defaultdict(list)
+        invalid_ids = set()
+        for trackpoint in user_trackpoints:
+            activity_id = trackpoint["activity_id"]
+            activity_dict[activity_id].append(trackpoint)
+
+        # Loop over every individual activity and look for trackpoints which deviate with 5 or more minutes.
+        for activity_id, trackpoints in activity_dict.items():
+
+            # If the activity has already been marked as invalid, skip it.
+            if activity_id in invalid_ids:
+                print(f"Activity ID: {activity_id} has already been marked as invalid. Skipping...")
+                continue
+
+            for i in range(1, len(trackpoints)):
+                current = trackpoints[i]["date_time"]
+                previous = trackpoints[i - 1]["date_time"]
+                time_diff = (current - previous).total_seconds() / 60
+                if time_diff >= 5:
+                    invalid_activities[user_id] += 1
+                    print(
+                        f"Found invalid activity for user_id: {user_id}, activity_id: {activity_id}. User currently has {invalid_activities[user_id]} invalid activities.")
+                    print(
+                        f"First trackpoint: {previous}, Second trackpoint: {current}, Time difference: {time_diff} minutes.")
+                    invalid_ids.add(activity_id)
+                    break
+
+    sorted_invalid_activities = sorted(invalid_activities.items(), key=lambda x: x[1], reverse=True)
+    for user_id, count in sorted_invalid_activities:
+        print(f"User ID: {user_id}, Invalid Activities: {count}")
+
+    query = activitiesCollection.aggregate([
         # Join Activities with TrackPoints
         {
             "$lookup": {
@@ -85,7 +130,6 @@ def query9(program):
             }
         },
         {"$unwind": "$track_points"},
-
         {"$sort": {"_id": 1, "track_points.date_time": 1}},
 
         {
@@ -127,14 +171,14 @@ def query9(program):
     ])
 
     for doc in query:
-        print(doc)
+        pprint(doc)
 
 
 def query11(program):
     """
-    Find all users who have registered transportation_mode and their most used transportation_mode.
-    First group by user_id and transportation_mode, count how many times each combination appears in the collection.
-    Sort this in descending order, so that the most used transportation_mode for each user_id is the first element in the list.
+    Find all users who have registered transportation_mode and their most used transportation_mode. First group by
+    user_id and transportation_mode, count how many times each combination appears in the collection. Sort this in
+    descending order, so that the most used transportation_mode for each user_id is the first element in the list.
     """
     collection = program.db['Activities']
 
@@ -155,6 +199,23 @@ def query11(program):
         {"$sort": {"_id": 1}}
     ])
 
+    queryv2 = collection.aggregate([
+        {
+            "$lookup": {
+                "from": "User",
+                "localField": "user_id",
+                "foreignField": "_id",
+                "as": "user"
+            },
+        },
+        {"$unwind": "$user"},
+        {"$match": {"has_labels": True}},
+        {"$group": {
+            "_id": {
+
+
+    ])
+
     for doc in query:
         pprint(doc)
 
@@ -166,7 +227,7 @@ def main():
         # query3(program)
         # query6(program)
         # query9(program)
-        # query11(program)
+        query11(program)
 
 
     except Exception as e:
