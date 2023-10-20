@@ -29,7 +29,7 @@ class queries:
         result = activitiesCollection.aggregate([
             {
                 "$match": {
-                    "transportation_mode": {"$ne": "Taxi"}
+                    "transportation_mode": "taxi"
                 }
             }, {
                 "$group": {
@@ -38,10 +38,7 @@ class queries:
             }
         ])
 
-        count = 0
         for doc in result:
-            count = count + 1
-            print(count)
             pprint(doc)
 
     def query5(self):
