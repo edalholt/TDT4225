@@ -8,6 +8,15 @@ class queries:
         self.client = self.connection.client
         self.db = self.connection.db
    
+    def query1(self):
+        userCollection = self.db["Users"]
+        activitiesCollection = self.db["Activities"]
+        trackpointsCollection = self.db["TrackPoints"]
+
+        print("Number of users:", userCollection.count_documents({}))
+        print("Number of activities:", activitiesCollection.count_documents({}))
+        print("Number of trackpoints:", trackpointsCollection.count_documents({}))
+
     def query2(self):
         userCollection = self.db["Users"]
         activitiesCollection = self.db['Activities']
@@ -108,7 +117,7 @@ def main():
     program = None
     try:
         program = queries()
-        program.query10()
+        program.query1()
 
 
     except Exception as e:
