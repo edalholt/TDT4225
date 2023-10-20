@@ -23,6 +23,27 @@ class queries:
 
         print(activitiesCollection.count_documents({}) / userCollection.count_documents({}))
 
+    def query4(self):
+        activitiesCollection = self.db["Activities"]
+
+        result = activitiesCollection.aggregate([
+            {
+                "$match": {
+                    "transportation_mode": {"$ne": "Taxi"}
+                }
+            }, {
+                "$group": {
+                   "_id": "$user_id"
+                }
+            }
+        ])
+
+        count = 0
+        for doc in result:
+            count = count + 1
+            print(count)
+            pprint(doc)
+
     def query5(self):
         activitiesCollection = self.db['Activities']
 
@@ -117,7 +138,7 @@ def main():
     program = None
     try:
         program = queries()
-        program.query1()
+        program.query4()
 
 
     except Exception as e:
