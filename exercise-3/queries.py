@@ -108,70 +108,12 @@ def query9(program):
                 time_diff = (current - previous).total_seconds() / 60
                 if time_diff >= 5:
                     invalid_activities[user_id] += 1
-                    print(
-                        f"Found invalid activity for user_id: {user_id}, activity_id: {activity_id}. User currently has {invalid_activities[user_id]} invalid activities.")
-                    print(
-                        f"First trackpoint: {previous}, Second trackpoint: {current}, Time difference: {time_diff} minutes.")
                     invalid_ids.add(activity_id)
                     break
 
     sorted_invalid_activities = sorted(invalid_activities.items(), key=lambda x: x[1], reverse=True)
     for user_id, count in sorted_invalid_activities:
         print(f"User ID: {user_id}, Invalid Activities: {count}")
-
-    query = activitiesCollection.aggregate([
-        # Join Activities with TrackPoints
-        {
-            "$lookup": {
-                "from": "TrackPoints",
-                "localField": "_id",
-                "foreignField": "activity_id",
-                "as": "track_points"
-            }
-        },
-        {"$unwind": "$track_points"},
-        {"$sort": {"_id": 1, "track_points.date_time": 1}},
-
-        {
-            "$group": {
-                "_id": "$_id",
-                "date_times": {"$push": "$track_points.date_time"},
-                "user_id": {"$first": "$user_id"}
-            }
-        },
-
-        {
-            "$project": {
-                "time_diffs": {
-                    "$map": {
-                        "input": {"$range": [0, {"$subtract": [{"$size": "$date_times"}, 1]}]},
-                        "as": "index",
-                        "in": {
-                            "$dateDiff": {
-                                "startDate": {"$arrayElemAt": ["$date_times", "$$index"]},
-                                "endDate": {"$arrayElemAt": ["$date_times", {"$add": ["$$index", 1]}]},
-                                "unit": "minute"
-                            }
-                        }
-                    }
-                },
-                "user_id": 1
-            }
-        },
-
-        {"$match": {"time_diffs": {"$elemMatch": {"$gte": 5}}}},
-
-        {
-            "$group": {
-                "_id": "$user_id",
-                "invalid_activities_count": {"$sum": 1}
-            }
-        },
-        {"$sort": {"invalid_activities_count": -1}}
-    ])
-
-    for doc in query:
-        pprint(doc)
 
 
 def query11(program):
@@ -181,9 +123,18 @@ def query11(program):
     descending order, so that the most used transportation_mode for each user_id is the first element in the list.
     """
     collection = program.db['Activities']
-
     query = collection.aggregate([
-        {"$match": {"transportation_mode": {"$exists": True, "$ne": None}}},
+        {
+            "$lookup": {
+                "from": "Users",
+                "localField": "user_id",
+                "foreignField": "_id",
+                "as": "user"
+            },
+        },
+        {"$unwind": "$user"},
+        {"$match": {"user.has_labels": True, "transportation_mode": {"$ne": None}}},
+
         {"$group": {
             "_id": {
                 "user_id": "$user_id",
@@ -197,22 +148,6 @@ def query11(program):
             "most_used_transportation_mode": {"$first": "$_id.transportation_mode"}
         }},
         {"$sort": {"_id": 1}}
-    ])
-
-    queryv2 = collection.aggregate([
-        {
-            "$lookup": {
-                "from": "User",
-                "localField": "user_id",
-                "foreignField": "_id",
-                "as": "user"
-            },
-        },
-        {"$unwind": "$user"},
-        {"$match": {"has_labels": True}},
-        {"$group": {
-            "_id": {
-
 
     ])
 
@@ -227,7 +162,7 @@ def main():
         # query3(program)
         # query6(program)
         # query9(program)
-        query11(program)
+        # query11(program)
 
 
     except Exception as e:
