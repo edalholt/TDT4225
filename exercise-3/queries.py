@@ -24,8 +24,9 @@ class queries:
         userCollection = self.db["Users"]
         activitiesCollection = self.db['Activities']
 
-        print(activitiesCollection.count_documents({}) / userCollection.count_documents({}))
-            
+        print(activitiesCollection.count_documents(
+            {}) / userCollection.count_documents({}))
+
     def query3(self):
         """
         Find the top 20 users with the highest number of activities.
@@ -50,7 +51,7 @@ class queries:
                 }
             }, {
                 "$group": {
-                   "_id": "$user_id"
+                    "_id": "$user_id"
                 }
             }
         ])
@@ -118,27 +119,30 @@ class queries:
     def query7(self):
         activitiesCollection = self.db['Activities']
         trackpointsCollection = self.db['TrackPoints']
-        userActivities = list(activitiesCollection.find({"user_id": "112", "transportation_mode": "walk"}, {"_id": 1}))
+        userActivities = list(activitiesCollection.find(
+            {"user_id": "112", "transportation_mode": "walk"}, {"_id": 1}))
 
         start_date = datetime.datetime(2008, 1, 1)
         end_date = datetime.datetime(2009, 1, 1)
-        
+
         distance = 0
         for activity in userActivities:
             trackpoints = list(trackpointsCollection.find({
-                            "activity_id": activity["_id"],
-                            "date_time": {
-                                "$gte": start_date,
-                                "$lt": end_date
-                            }
-                        }))
+                "activity_id": activity["_id"],
+                "date_time": {
+                    "$gte": start_date,
+                    "$lt": end_date
+                }
+            }))
 
             last_pos = None
             for trackpoint in trackpoints:
                 if last_pos is not None:
-                    distance += hs.haversine((last_pos[1], last_pos[0]), (trackpoint['location']['coordinates'][1], trackpoint['location']['coordinates'][0]), unit=hs.Unit.KILOMETERS)
+                    distance += hs.haversine((last_pos[1], last_pos[0]), (trackpoint['location']['coordinates']
+                                             [1], trackpoint['location']['coordinates'][0]), unit=hs.Unit.KILOMETERS)
                 last_pos = trackpoint['location']['coordinates']
-        print("Total distance walked by user 112 in 2008: ", round(distance, 3), "km")
+        print("Total distance walked by user 112 in 2008: ",
+              round(distance, 3), "km")
 
     def query8(self):
         activitiesCollection = self.db['Activities']
@@ -148,30 +152,33 @@ class queries:
 
         # For each user with an activity, find all trackpoints for the user's activities.
         for userID in activitiesCollection.distinct("user_id"):
-            userActivities = list(activitiesCollection.find({"user_id": userID}, {"_id": 1}))
-            userActivityIds = [activity["_id"] for activity in userActivities]
-
-            trackpoints = list(
-                trackpointsCollection.find({"activity_id": {"$in": userActivityIds}, "altitude": {"$ne": -777}}))
-
+            userActivities = list(activitiesCollection.find(
+                {"user_id": userID}, {"_id": 1}))
             altitude_gain = 0
-            last_altitude = 0
-            for trackpoint in trackpoints:
-                if trackpoint['altitude'] > last_altitude:
-                    altitude_gain += trackpoint['altitude'] - last_altitude
-                last_altitude = trackpoint['altitude']
+            for activity in userActivities:
+                trackpoints = list(
+                    trackpointsCollection.find({"activity_id": activity["_id"], "altitude": {"$ne": -777}}))
+
+                last_altitude = None
+                for trackpoint in trackpoints:
+                    if last_altitude is not None and trackpoint['altitude'] > last_altitude:
+                        altitude_gain += trackpoint['altitude'] - last_altitude
+                    last_altitude = trackpoint['altitude']
 
             # Convert altitude gain from feet to meters.
             altitude_gain = round(altitude_gain * 0.3048, 2)
             print("User: ", userID, " Altitude gain: ", altitude_gain)
-            altitude_gain_by_user.append({"user_id": userID, "altitude_gain": altitude_gain})
+            altitude_gain_by_user.append(
+                {"user_id": userID, "altitude_gain": altitude_gain})
 
         # Sort the list of users by altitude gain and print the top 20.
-        altitude_gain_by_user.sort(key=lambda x: x['altitude_gain'], reverse=True)
+        altitude_gain_by_user.sort(
+            key=lambda x: x['altitude_gain'], reverse=True)
         print("\n\n")
         print("Top 20 users with highest altitude gain:")
         for user in altitude_gain_by_user[:20]:
-            print("User: ", user['user_id'], " Altitude gain: ", user['altitude_gain'])
+            print("User: ", user['user_id'],
+                  " Altitude gain: ", user['altitude_gain'])
 
     def query9(self):
         activitiesCollection = self.db['Activities']
@@ -180,8 +187,10 @@ class queries:
         invalid_activities = defaultdict(int)
         for user_id in activitiesCollection.distinct("user_id"):
             # get all activities belonging to the user.
-            user_activities = list(activitiesCollection.find({"user_id": user_id}, {"_id": 1}))
-            user_activity_ids = [activity["_id"] for activity in user_activities]
+            user_activities = list(activitiesCollection.find(
+                {"user_id": user_id}, {"_id": 1}))
+            user_activity_ids = [activity["_id"]
+                                 for activity in user_activities]
 
             # get all trackpoints for the user's activities.
             user_trackpoints = trackpointsCollection.find({"activity_id": {"$in": user_activity_ids}},
@@ -198,7 +207,8 @@ class queries:
 
                 # If the activity has already been marked as invalid, skip it.
                 if activity_id in invalid_ids:
-                    print(f"Activity ID: {activity_id} has already been marked as invalid. Skipping...")
+                    print(
+                        f"Activity ID: {activity_id} has already been marked as invalid. Skipping...")
                     continue
 
                 for i in range(1, len(trackpoints)):
@@ -210,7 +220,8 @@ class queries:
                         invalid_ids.add(activity_id)
                         break
 
-        sorted_invalid_activities = sorted(invalid_activities.items(), key=lambda x: x[1], reverse=True)
+        sorted_invalid_activities = sorted(
+            invalid_activities.items(), key=lambda x: x[1], reverse=True)
         for user_id, count in sorted_invalid_activities:
             print(f"User ID: {user_id}, Invalid Activities: {count}")
 
@@ -235,10 +246,11 @@ class queries:
 
         user_ids = activitiesCollection.distinct("user_id",
                                                  {"_id":
-                                                      {"$in": trackpoints}
+                                                  {"$in": trackpoints}
                                                   })
 
-        print(f"\n\nUsers that have tracked an activity within a radius of {distance}m of the forbidden city:")
+        print(
+            f"\n\nUsers that have tracked an activity within a radius of {distance}m of the forbidden city:")
         pprint(user_ids)
 
     def query11(self):
@@ -288,7 +300,6 @@ def main():
     program = None
     try:
         program = queries()
-
 
     except Exception as e:
         print("ERROR: Failed to use database:", e)
