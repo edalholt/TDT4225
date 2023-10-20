@@ -38,6 +38,7 @@ class queries:
             }
         ])
 
+        print("Users who have taken a taxi:")
         for doc in result:
             pprint(doc)
 
