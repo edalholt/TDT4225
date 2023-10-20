@@ -1,6 +1,6 @@
 from collections import defaultdict
 from pprint import pprint
-
+import datetime
 from DbConnector import DbConnector
 
 
@@ -25,6 +25,20 @@ class queries:
         activitiesCollection = self.db['Activities']
 
         print(activitiesCollection.count_documents({}) / userCollection.count_documents({}))
+            
+    def query3(self):
+        """
+        Find the top 20 users with the highest number of activities.
+        Group by user_id, count how many times this user_id appears in the collection.
+        """
+        collection = self.db['Activities']
+        documents = collection.aggregate([
+            {"$group": {"_id": "$user_id", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": 20}
+        ])
+        for doc in documents:
+            pprint(doc)
 
     def query4(self):
         activitiesCollection = self.db["Activities"]
@@ -43,20 +57,6 @@ class queries:
 
         print("Users who have taken a taxi:")
         for doc in result:
-            pprint(doc)
-            
-    def query3(self):
-        """
-        Find the top 20 users with the highest number of activities.
-        Group by user_id, count how many times this user_id appears in the collection.
-        """
-        collection = self.db['Activities']
-        documents = collection.aggregate([
-            {"$group": {"_id": "$user_id", "count": {"$sum": 1}}},
-            {"$sort": {"count": -1}},
-            {"$limit": 20}
-        ])
-        for doc in documents:
             pprint(doc)
 
     def query5(self):
@@ -114,6 +114,31 @@ class queries:
         ])
         for doc in documents:
             pprint(doc)
+
+    def query7(self):
+        activitiesCollection = self.db['Activities']
+        trackpointsCollection = self.db['TrackPoints']
+        userActivities = list(activitiesCollection.find({"user_id": "112", "transportation_mode": "walk"}, {"_id": 1}))
+
+        start_date = datetime.datetime(2008, 1, 1)
+        end_date = datetime.datetime(2009, 1, 1)
+        
+        distance = 0
+        for activity in userActivities:
+            trackpoints = list(trackpointsCollection.find({
+                            "activity_id": activity["_id"],
+                            "date_time": {
+                                "$gte": start_date,
+                                "$lt": end_date
+                            }
+                        }))
+
+            last_pos = None
+            for trackpoint in trackpoints:
+                if last_pos is not None:
+                    distance += hs.haversine((last_pos[1], last_pos[0]), (trackpoint['location']['coordinates'][1], trackpoint['location']['coordinates'][0]), unit=hs.Unit.KILOMETERS)
+                last_pos = trackpoint['location']['coordinates']
+        print("Total distance walked by user 112 in 2008: ", round(distance, 3), "km")
 
     def query8(self):
         activitiesCollection = self.db['Activities']
@@ -252,12 +277,6 @@ class queries:
         ])
 
         for doc in query:
-            pprint(doc)
-
-    def queryExample(self):
-        collection = self.db['Activities']
-        documents = collection.find({})
-        for doc in documents:
             pprint(doc)
 
     def show_coll(self):
